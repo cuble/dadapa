@@ -6,8 +6,10 @@
 # To enable this hook, rename this file to "post-commit".
 
 cur_dir=`pwd`
+echo "cur_dir is $cur_dir"
 cd src
-source component-ci
+echo $(pwd)
+source ./component-ci
 cd $cur_dir
 
 : Nothing

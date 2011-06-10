@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+
+cur_dir=`pwd`
+#echo "cur_dir is $cur_dir"
+#changed_prj=`git show HEAD`
+#echo "changed_prj is $changed_prj"
+cd src
+. `pwd`/component-ci
+cd $cur_dir
+
+: Nothing

@@ -3,8 +3,22 @@
 CPPUTEST_URL=https://cpputest.svn.sourceforge.net/svnroot/cpputest/trunk/
 LAST_CHANGE=.cpputest_last_change
 
-record_date() {
+function record_date() {
 echo `date +%Y%m`>$LAST_CHANGE
+}
+
+function do_update() {
+  echo "update cpputest per month"
+  record_date
+  new_rev=`svn up|grep "At revision"`
+  new_rev=${new_rev:12}
+  org_rev=${org_rev:10}
+  if [ $new_rev -eq $org_rev ]; then
+    echo "no version change"
+  else
+    make clean
+    make
+  fi
 }
 
 # update cpputest 
@@ -12,12 +26,14 @@ function update_cpputest() {
 org_rev=`svn info|grep Revision`
 if [ $? -eq 0 ]; then
   #echo "cpputest already checkout, update it"
-  svn up|grep "At revision"
-  record_date
+  cur_date=`date +%Y%m`
+  last_update_date=`cat $LAST_CHANGE`
+  [ $cur_date -eq $last_update_date ] && exit 0||do_update
 else
-  echo "cpputest not checkout yet, checkout it"
+  #echo "cpputest not checkout yet, checkout it"
   svn co $CPPUTEST_URL .
   record_date
+  make
 fi
 
 }
