@@ -1,0 +1,15 @@
+It's the work mode for one people with different work places.
+1. only one branch.
+  - update before you start your work
+  - commit and push your work before you shutdown your computer.
+
+2. Auto compile can be done with post-merge hook in .git folder. 
+  - use ssh-agent in Linux to avoid enter passphrase: http://help.github.com/ssh-key-passphrases/
+  - In the script to auto update cpputest by svn
+  - Do component CI for all moudules after "git pull"
+
+3. Config git to not track .d .o and other generated files.
+
+4. make sure your component CI pass before you check it in.
+
+

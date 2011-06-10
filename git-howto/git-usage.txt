@@ -28,7 +28,7 @@
       git config user.email "fouryu@github.com"
 
 4. Start a project on github:
-  4.1 for proxy needed environent we need to access github via https instead of the ssh and set proxy for git.
+  4.1 for proxy needed environent we can access github via https instead of the ssh and set proxy for git.
       git config --global http.proxy http://proxyserver.com:port
   4.2 Create the repo on github webpage and initialize the project locally:
     create repo my-project remotelly
@@ -72,7 +72,7 @@
 
 
 6. Something you should know
-   6.1 target of commit is the staged changes, not the whole changed file.
+   6.1 target of a commit is the staged changes, not the whole changed file.
    6.2 ~/.gitconfig stores the global git configuration
    6.3 repo/.git/object, stores the git objects, the name is the first two letter of the sha1 hash of the objects.
    6.4 repo/.git/config, project-specific configuration
