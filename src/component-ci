@@ -9,7 +9,7 @@ for prj in $projects; do
   if [ -f $prj/component-ci ]; then
     # each sub project should have its own component-ci
     cd $prj
-    . component-ci
+    . `pwd`/component-ci
     cd $prj_root
   else
     echo "component cci not exist in $prj"
