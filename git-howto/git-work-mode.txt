@@ -12,4 +12,5 @@ It's the work mode for one people with different work places.
 
 4. make sure your component CI pass before you check it in.
 
+5. make a tag after each sprint done. The name of the tag is Sprint-n. Push the tag to github by "git push origin master --tags"
 
