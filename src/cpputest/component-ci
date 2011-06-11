@@ -1,6 +1,6 @@
 # !bin/bash
 #This is a script designed to do component continous integration
-CPPUTEST_URL=https://cpputest.svn.sourceforge.net/svnroot/cpputest/trunk/
+CPPUTEST_URL="https://cpputest.svn.sourceforge.net/svnroot/cpputest/trunk/"
 LAST_CHANGE=.cpputest_last_change
 
 function record_date() {
