@@ -7,8 +7,8 @@ Mission:
 Backlog:
 1. establish a git or a svn environment for the documentation and code to make the developing process auditable.
  1.1 setup a git repo to store project files --Done
- 1.2 make or create a tool to manage my backlog.
- 1.3 setup git work environment to auto compile after commit
+ 1.2 make or create a tool to manage my backlog.  --on going
+ 1.3 setup git work environment to auto compile after pull --done
 2. Develop a Chinese input method
 3. Make the UI of the tool beautiful and easy to use.
 4. Make the tool has good vocabulary lib.

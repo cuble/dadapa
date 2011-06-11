@@ -1,0 +1,11 @@
+Achievements:
+1. mv git study notes and scripts to git-howto. 
+2. Reviewed git-usage.txt and git-usage-advance.txt
+3. created component-ci(CCI) framework. And call CCI at post-merge of .git/hooks. CCI will run automatically after each git pull.
+4. complete my Way of Work(git-work-mode.txt) with git this stage.
+5. Finished cpputest cci script: cpputest will be updated per month. If new version fetched, it will compile itself.
+6. Created a backlog for backlog-editor
+
+Not done items:
+1. a python script to create Sprint folder automatically
+2. backlog-editor implementation
