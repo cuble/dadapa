@@ -15,12 +15,20 @@ def get_last_num():
     
 def create_folder_if_not_exist(folder):
     '''Create folder in case the folder not exist in cur dir'''
-    cmd = "mkdir " + folder
-    system(cmd)
+    if os.path.isdir(folder):
+        pass
+    else:
+        cmd = "mkdir " + folder + "; cd " + folder
+        system(cmd)
 
 def create_file_if_not_exist(file):
     '''Create file in case te file not exist in cur dir'''
-    print file
+    if os.path.isfile(file): print file + " exist"
+    else: 
+        f=open(file, 'w+')
+        f.write("Commited Items:\n")
+        print file + " created"
+        f.close()
     pass
 
 def del_folder(folder):
@@ -46,7 +54,9 @@ class sprintOp:
             print "not initialized yet"
             return
         create_folder_if_not_exist(self.name)
-        for file in self.files: create_file_if_not_exist(file)
+        for file in self.files: 
+            file = self.name+"/"+file
+            create_file_if_not_exist(file)
         
     def create_new_sprint(self):
         self.locate_num(get_last_num())
