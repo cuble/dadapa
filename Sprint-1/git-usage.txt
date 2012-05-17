@@ -1,0 +1,30 @@
+1. Installation:
+  Fedora Linux: sudo yum install git
+  Windows: http://msysgit.github.com/
+  
+  
+2. Available online git repository: https://github.com
+  Created my account: fouryu@sina.com.cn
+
+3. Configure git locally:
+  3.1 generate my RSA key: 
+    generate_my_key.sh
+    Note: the Email info and passphrase should be changed accordingly.
+  3.2 upload the RSA key to github: 
+    github->account settings->SSH Keys->Add SSH Key
+    copy the whole content of ~/.ssh/id_rsa.pub to "Key" part of the github webpage.
+  3.3 test connection to github: 
+    ssh -T git@github.com
+    reply yes to the command prompt
+    find the passphrase from the generate_my_key.sh script. Or use ssh-agent to auto input the passphrase: http://help.github.com/ssh-key-passphrases/
+  3.4 Setup my information
+    Configure global user information which used for all the folders working with git.
+      git config --global user.name "Chen Gang-Cuble"
+      git config --global user.email "fouryu@sina.com.cn"
+    You also can configure a different user for a particular repository
+      cd a_particular_repo
+      git config user.name "fouryu"
+      git config user.email "fouryu@github.com"
+  3.5 
+
+

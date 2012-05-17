@@ -1,0 +1,14 @@
+Period: 2012-5-15 ~ 2012-5-21
+Based Project Backlog: Version 1
+
+Committed Item: 1. establish a git or a svn environment for the documentation and code to make the developing process auditable.
+
+Requirement Analysis:
+1. We need to store Backlog, Sprint Backlog, Acceptance Cases, Code and documentation to the repository(Sprint output include Acceptance cases, code and documentation)
+2. We need easy to link backlog with sprint backlog.
+3. We need easy to link Sprint outputs to backlog item and sprint.
+4. When Code commit, we need CI test Cases run.
+
+
+Sprint Item:
+

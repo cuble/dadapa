@@ -1,0 +1,15 @@
+Version 1: 2012-5-15
+
+Vision: to make input Chinese in Linux as convinient as in Windows though Agile practicing.
+
+Mission: 
+1. Develop a Chinese input tool in Linux which can be installed in Fedora/Ubuntu at least, and input to other Linux distributions would be better. 
+2. Practicing ATDD and virtual Scrum, try to solve the Agile Engineering tools problem in the process. While solve here means develop ones in case can't find proper ones. Try to organize the study result during the process in a good shape 
+
+Backlog:
+1. establish a git or a svn environment for the documentation and code to make the developing process auditable.
+2. Develop a Chinese input method
+3. Make the UI of the tool beautiful and easy to use.
+4. Make the tool has good vocabulary lib.
+
+
