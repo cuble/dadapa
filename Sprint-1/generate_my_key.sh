@@ -16,4 +16,4 @@ fi
 
 echo "Generating RSA key pair for fouryu@sina.com.cn"
 # key file is ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub; -N provide passphrase, -C provide the comments.
-ssh-keygen -q -t rsa -f $HOME/.ssh/id_rsa -N myGit8109 -C "fouryu@sina.com.cn"
+ssh-keygen -q -t rsa -f $HOME/.ssh/id_rsa -N xxxxx -C "fouryu@sina.com.cn"

@@ -11,4 +11,10 @@ Requirement Analysis:
 
 
 Sprint Item:
+1. Analysis git Vs. svn         ---done, study notes git-vs-svn.TXT created
+2. Rigister account on github.com   ---done, account cuble
+3. Create project "dadapa" on github.com    ---done, remote repo: git@github.com:cuble/dadapa.git
+4. Commit work files locally to github.com    ---done
+5. study git usage    ---ongoing, preparing git-usage.txt
+6. create work mod with git, prepare needed shell_scripts
 

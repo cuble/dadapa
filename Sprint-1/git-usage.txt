@@ -5,6 +5,7 @@
   
 2. Available online git repository: https://github.com
   Created my account: fouryu@sina.com.cn
+  Set my account username: cuble
 
 3. Configure git locally:
   3.1 generate my RSA key: 
@@ -25,6 +26,25 @@
       cd a_particular_repo
       git config user.name "fouryu"
       git config user.email "fouryu@github.com"
-  3.5 
+
+4. Start a project on github:
+  4.1 for proxy needed environent we need to access github via https instead of the ssh
+      git config --global http.proxy http://proxyserver.com:port
+  4.2 Create the repo on github webpage and setup the project locally:
+    create repo my-project remotelly
+    mkdir my-project
+    cd myproject
+    git init
+    git touch README
+    git add README
+    git commit -m 'first commit'
+    git remote add origin git@github.com:cuble/my-project.git
+      Enter your pasphrase you set during ssh-keygen to access
+    (for proxy needed environent: git remote add origin https://cuble@github.com/cuble/my-project.git
+       Enter your github account password to access)
+    git push -u origin master
+
+5. Work on with github:  
+    
 
 
