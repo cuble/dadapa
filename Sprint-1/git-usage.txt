@@ -10,7 +10,7 @@
 3. Configure git locally:
   3.1 generate my RSA key: 
     generate_my_key.sh
-    Note: the Email info and passphrase should be changed accordingly.
+    Note: the Email info and passphrase in the shell script should be changed accordingly.
   3.2 upload the RSA key to github: 
     github->account settings->SSH Keys->Add SSH Key
     copy the whole content of ~/.ssh/id_rsa.pub to "Key" part of the github webpage.
@@ -28,9 +28,9 @@
       git config user.email "fouryu@github.com"
 
 4. Start a project on github:
-  4.1 for proxy needed environent we need to access github via https instead of the ssh
+  4.1 for proxy needed environent we need to access github via https instead of the ssh and set proxy for git.
       git config --global http.proxy http://proxyserver.com:port
-  4.2 Create the repo on github webpage and setup the project locally:
+  4.2 Create the repo on github webpage and initialize the project locally:
     create repo my-project remotelly
     mkdir my-project
     cd myproject
@@ -39,12 +39,21 @@
     git add README
     git commit -m 'first commit'
     git remote add origin git@github.com:cuble/my-project.git
-      Enter your pasphrase you set during ssh-keygen to access
-    (for proxy needed environent: git remote add origin https://cuble@github.com/cuble/my-project.git
-       Enter your github account password to access)
+    (for proxy needed environent: git remote add origin https://cuble@github.com/cuble/my-project.git)
     git push -u origin master
+      Enter your pasphrase you set during ssh-keygen to access in case you add git@...
+      Enter your github account password to access in case you add https://...
 
 5. Work on with github:  
-    
+   5.1 git log: check commit hitstory 
+   5.2 git diff: check what have changed after laster commit/add 
+   5.3 git pull: fetch from and merge with another repository or a local branch. git pull is shorthand for git fetch followed by git merge FETCH_HEAD. More precisely, git pull run git rebase instead of git merge.
+   5.4 git add: to add a file or a change to version control system in a git repo. "git add ." to make git track each of the files in the project directory. 
+   5.5 git diff: create the difference between your current work and the original. 
+   5.6 git commit -m "msg": commit the changes to the local git version control. git commit -a, is a combined of add changed_files and commit.
+   5.7 remove file just by remove it from the local git repo and commit.
+   5.8 git checkout
 
 
+
+6. Something you should know
