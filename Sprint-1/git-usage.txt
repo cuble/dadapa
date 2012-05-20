@@ -41,19 +41,69 @@
     git remote add origin git@github.com:cuble/my-project.git
     (for proxy needed environent: git remote add origin https://cuble@github.com/cuble/my-project.git)
     git push -u origin master
-      Enter your pasphrase you set during ssh-keygen to access in case you add git@...
-      Enter your github account password to access in case you add https://...
+      Enter your pasphrase you set during ssh-keygen in case you add git@...
+      Enter your github account password in case you add https://...
 
 5. Work on with github:  
-   5.1 git log: check commit hitstory 
-   5.2 git diff: check what have changed after laster commit/add 
-   5.3 git pull: fetch from and merge with another repository or a local branch. git pull is shorthand for git fetch followed by git merge FETCH_HEAD. More precisely, git pull run git rebase instead of git merge.
-   5.4 git add: to add a file or a change to version control system in a git repo. "git add ." to make git track each of the files in the project directory. 
-   5.5 git diff: create the difference between your current work and the original. 
-   5.6 git commit -m "msg": commit the changes to the local git version control. git commit -a, is a combined of add changed_files and commit.
-   5.7 remove file just by remove it from the local git repo and commit.
-   5.8 git checkout
+   5.1* git log: check commit hitstory. Try: git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short.
+   5.2* git pull: fetch from and merge with another repository. git pull is shorthand for "git fetch" followed by "git merge" FETCH_HEAD. More precisely, git pull run git rebase instead of git merge.
+   5.3* git add: to add a file or a change to be staged in a git repo. "git add ." to stage all the changed files, which include added and modified, in the project directory. 
+   5.4* git diff: show differences between your current working files and the files staged to git. 
+        *git diff <hash1> <hash2>: show differences between the two commit. We only need short hash value which long 6 char.
+   5.5* git commit -m "msg": commit the staged changes to the local git version control. git commit -a, is a combined of "git add changed_files" and commit.
+        git commit --amend -m "more msg amend to the previous commit"
+   5.6* git rm: stage a file to be removed from the version control system.
+   5.7* git reset: to unstage changes, "git reset file" to unstage the changes on the file. 
+   5.8* git status: check the status of the working copy. It will track changes that staged and unstaged, which include files adding and removing.
+   5.9* git checkout: checkout the target version. "git checkout <hash>", go to the <hash> version. "git checkout master" return to the HEAD. 
+        git checkout changed_file: drop unstage changes to the changed_file.
+        git checkout <branch>: switch to a local branch.
+        git checkout <tag>: switch to a tag version.
+   5.10* git tag: tag one version of the working copy. "git tag V1", "git checkout V1".
+   5.11 git revert: to revert a commit. For example: git revert HEAD --no-edit.
+   5.12 git config: configure git environent. For example: git config --global alias.co "checkout": set alias co=checkout in git. We can set a shortcut for the log command in 5.1
+   5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the current head of current branch).
+   5.14 git merge branch1: merge branch1 to current branch. 
+   5.15 git rebase branch1: merge branch1 to current branch, and commit history will also merged together to current branch.
+   5.16* git push origin master: push local committed changes to the master brach of remote/origin repo.
+   5.17* git clone remote_repo local_repo: after clone, the remote/origin of local_repo is refer to remote_repo
+   5.18 git cat-file -t <hash>, git cat-file -p <hash>: to type, dump objects contents referred by the <hash>
 
 
 
 6. Something you should know
+   6.1 target of commit is the staged changes, not the whole changed file.
+   6.2 ~/.gitconfig stores the global git configuration
+   6.3 repo/.git/object, stores the git objects, the name is the first two letter of the sha1 hash of the objects.
+   6.4 repo/.git/config, project-specific configuration
+   6.5 repo/.git/refs, stored the reference of head and tags. And the .git/HEAD is referred to .git/refs/head/master
+   6.6 git clone --bare my_local_project share_my_local_project.git: will copy a shared only repo, it only contain the contents in .git of the my_local_project repo. So you can't work directly in the xxx.git repo.
+
+Appendix-I. "~/.gitconfig" example:
+[alias]
+	co = checkout
+	ci = commit
+	st = status
+	br = branch
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	type = cat-file -t
+	dump = cat-file -p
+	ps = push origin master
+	pu = pull
+[user]
+	name = Chen Gang-Cuble
+	email = fouryu@sina.com.cn
+
+
+Appendix-II other git commands:
+git hist --all: to show log of all the branches in the local repo.
+git remote add share another_remote_repo: to add another remote to local repo.
+git reset --hard <hash>: to drop commit permanently.
+
+
+
+	
+Appendix-III. Good Guide:
+http://help.github.com/
+http://gitimmersion.com/lab_01.html
+http://gitimmersion.com/lab_52.html
