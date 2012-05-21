@@ -82,14 +82,14 @@
 Appendix-I. "~/.gitconfig" example:
 [alias]
 	co = checkout
-	ci = commit
+	ci = commit -a
 	st = status
 	br = branch
 	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
 	type = cat-file -t
 	dump = cat-file -p
 	ps = push origin master
-	pu = pull
+	up = pull
 [user]
 	name = Chen Gang-Cuble
 	email = fouryu@sina.com.cn
