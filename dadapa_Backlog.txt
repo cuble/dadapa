@@ -1,5 +1,3 @@
-Version 1: 2012-5-15
-
 Vision: to make input Chinese in Linux as convinient as in Windows though Agile practicing.
 
 Mission: 
