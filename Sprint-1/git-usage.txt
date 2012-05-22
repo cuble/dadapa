@@ -42,7 +42,7 @@
     (for proxy needed environent: git remote add origin https://cuble@github.com/cuble/my-project.git)
     git push -u origin master
       Enter your pasphrase you set during ssh-keygen in case you add git@...
-      Enter your github account password in case you add https://...
+      Enter your github account password in case you add https://..., the password can be added in the url: https://cuble:mypassword@github.com/cuble/my-project.git
 
 5. Work on with github:  
    5.1* git log: check commit hitstory. Try: git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short.
