@@ -46,7 +46,7 @@
 
 5. Work on with github:  
    5.1* git log: check commit hitstory. Try: git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short.
-   5.2* git pull: fetch from and merge with another repository. git pull is shorthand for "git fetch" followed by "git merge" FETCH_HEAD. More precisely, git pull run git rebase instead of git merge.
+   5.2* git pull: fetch from and merge with another repository. git pull is shorthand for "git fetch" followed by "git merge FETCH_HEAD".
    5.3* git add: to add a file or a change to be staged in a git repo. "git add ." to stage all the changed files, which include added and modified, in the project directory. 
    5.4* git diff: show differences between your current working files and the files staged to git. 
         *git diff <hash1> <hash2>: show differences between the two commit. We only need short hash value which long 6 char.
