@@ -78,6 +78,7 @@
    6.4 repo/.git/config, project-specific configuration
    6.5 repo/.git/refs, stored the reference of head and tags. And the .git/HEAD is referred to .git/refs/head/master
    6.6 git clone --bare my_local_project share_my_local_project.git: will copy a shared only repo, it only contain the contents in .git of the my_local_project repo. So you can't work directly in the xxx.git repo.
+   6.7 /usr/share/git-core/templates, it include some template for high-level git usage.
 
 Appendix-I. "~/.gitconfig" example:
 [alias]
