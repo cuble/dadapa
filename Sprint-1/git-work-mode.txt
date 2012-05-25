@@ -4,4 +4,4 @@ It's the work mode for one people with different work places.
   - commit and push your work before you shutdown your computer.
 
 2. Auto compile can be done with post-commit hook in .git folder. 
-
+  - use ssh-agent in Linux to avoid enter passphrase: http://help.github.com/ssh-key-passphrases/

@@ -15,6 +15,7 @@ Sprint Item:
 2. Rigister account on github.com   ---done, account cuble
 3. Create project "dadapa" on github.com    ---done, remote repo: git@github.com:cuble/dadapa.git
 4. Commit work files locally to github.com    ---done
-5. study git usage    ---Only review needed
-6. create work mod with git, prepare needed shell_scripts
+5. *study git usage    ---Only review needed
+6. create work mod with git   ---done
+7. *copy cppUtest to start my work
 
