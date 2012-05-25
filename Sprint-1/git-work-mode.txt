@@ -1,0 +1,7 @@
+It's the work mode for one people with different work places.
+1. only one branch.
+  - update before you start your work
+  - commit and push your work before you shutdown your computer.
+
+2. Auto compile can be done with post-commit hook in .git folder. 
+
