@@ -5,3 +5,9 @@ It's the work mode for one people with different work places.
 
 2. Auto compile can be done with post-commit hook in .git folder. 
   - use ssh-agent in Linux to avoid enter passphrase: http://help.github.com/ssh-key-passphrases/
+  - In the script to auto update cpputest by svn
+  - In the script to auto detect if files in src changed, and auto compile if src changed.
+
+3. Config git to not track to .d .o and other generated files.
+
+
