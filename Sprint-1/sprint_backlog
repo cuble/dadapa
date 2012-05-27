@@ -20,4 +20,7 @@ Sprint Item:
 7. copy cppUtest to start my work  --done
   -- svn co https://cpputest.svn.sourceforge.net/svnroot/cpputest/trunk/ cpputest
 *8. prepare post-commit script to auto compile   --on going
+9. Ignore cpputest in git repo and do svn co or up in component-ci script
+  - Ignore cpputest in git repo
+  -* add cpputest update related function in the component-ci script
 
