@@ -1,0 +1,7 @@
+1. To ignore generated files added to the git repo
+  - add files you want to ignore into .gitignore in the repo
+
+2. To do automatic compile after commit
+  - To detect if src file changed
+
+
