@@ -1,0 +1,11 @@
+# To ignore all files under app/ except app/language/gr/
+# you can skip this first one if it is not already excluded by prior patterns
+!app/
+
+app/*
+!app/language/
+
+app/language/*
+!app/language/gr/
+
+
