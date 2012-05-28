@@ -1,0 +1,15 @@
+Achievement:
+1. compared git and svn, chosed git as my version control system.
+2. git-usage.txt which introduced how to use git and how to create repo on github. 
+3. project was established on github
+4. generate_my_key.sh which is used to generate rsa key pair.
+5. Add ssh-agent function in ~/.bashrc to make git push without passphrase.
+6. git-usage-advance.txt, which studied about how to ignore files in git repo.
+
+Items not completed yet:
+1. git-usage-advance, which to compile automaticlly after each commit.
+2. make git-usage as a separate output in the project which not only in Sprint-1 
+3. review git-usage.txt, refine git work mode.
+4. component-ci script to handle cpputest automatic update issue.
+
+
