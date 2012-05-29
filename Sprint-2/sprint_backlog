@@ -1,7 +1,12 @@
+Period: 2012-5-29 ~ 2012-6-4
+
 Commited Items:
 1. review git-usage.txt.
 2. refine git work mode
 3. make git study notes to a separate output
 4. componet-ci: to handle cpputest update automatically
 5. component-ci: to compile automatically after commit
+
+Not commited item:
+1. a tool to manipulate the Sprint items
 
