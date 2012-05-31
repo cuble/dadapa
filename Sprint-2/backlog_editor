@@ -1,0 +1,18 @@
+Function:
+As a product owner, I want to start a new backlog so that I can start a new project.
+As a product owner, I want to save the backlog so that I can record my progress.
+As a product owner, I want to open a saved backlog so that I can continue my work on a project.
+As a product owner, I want to open a text sprint backlog so that I can trasfer my existing works into the tool.
+As a product owner, I want to list all done and undone items seprately, so that I can know what has done and what need to be done obviously.
+As a product owner, I want to add items to the backlog so that I can add new work to my project.
+As a product owner, I want to delete undone items of the backlog so that I can remove not needed works.
+As a product owner, I want to display the items in a prioritised order so that I can focus on high priority works easily.
+As a product owner, I want to change the item priority so that I can adjust my work focus timely.
+As a product owner, I want to change the item to done state so that I can mark a work completed.
+As a product owner, I want the tool record my item done time automatically so that I can review my progress by period.
+As a product owner, I want to modify the undone items so that it can reflect my understanding to the requirement timely
+As a product owner, I want to change the item from done to undone so that I can handle some exceptional cases such as I mark it done by mistake or some new works introduced to the old item.
+As a user, I want to undo my changes so that I can recover my wrong operation quickly.
+As a implementer, I want to attach outcome to the item so that I can trace our progress from the backlog-editor
+As an implementer, I want to add sub-items to the item so that it can reflect our understanding to the task more structured.
+
