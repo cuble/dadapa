@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# An example hook script that is called after a successful
+# commit is made.
+#
+# To enable this hook, rename this file to "post-commit".
+
+cur_dir=`pwd`
+cd src
+source component-ci
+cd $cur_dir
+
+: Nothing
