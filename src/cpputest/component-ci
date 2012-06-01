@@ -1,0 +1,26 @@
+# !bin/bash
+#This is a script designed to do component continous integration
+CPPUTEST_URL=https://cpputest.svn.sourceforge.net/svnroot/cpputest/trunk/
+LAST_CHANGE=.cpputest_last_change
+
+record_date() {
+echo `date +%Y%m`>$LAST_CHANGE
+}
+
+# update cpputest 
+function update_cpputest() {
+org_rev=`svn info|grep Revision`
+if [ $? -eq 0 ]; then
+  #echo "cpputest already checkout, update it"
+  svn up|grep "At revision"
+  record_date
+else
+  echo "cpputest not checkout yet, checkout it"
+  svn co $CPPUTEST_URL .
+  record_date
+fi
+
+}
+update_cpputest
+
+

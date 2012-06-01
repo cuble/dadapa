@@ -1,3 +1,4 @@
-src/cpputest
+src/cpputest/*
+!src/cpputest/component-ci
 *.o
 

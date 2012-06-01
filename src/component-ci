@@ -1,6 +1,19 @@
-#This is a script designed to do component continous integration
+# !bin/bash
+# This is a script designed to do component continous integration
 
-echo "component-ci was executed"
-git show HEAD|grep src/
+# add subproject to projects
+projects="cpputest backlog-editor"
+prj_root=`pwd`
+for prj in $projects; do 
+  echo "--------runing $prj cci--------"
+  if [ -f $prj/component-ci ]; then
+    # each sub project should have its own component-ci
+    cd $prj
+    . component-ci
+    cd $prj_root
+  else
+    echo "component cci not exist in $prj"
+  fi
+done  
 
 
