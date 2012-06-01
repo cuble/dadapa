@@ -10,6 +10,7 @@ As a product owner, I want to display the items in a prioritised order so that I
 As a product owner, I want to change the item priority so that I can adjust my work focus timely.
 As a product owner, I want to change the item to done state so that I can mark a work completed.
 As a product owner, I want the tool record my item done time automatically so that I can review my progress by period.
+As a product owner, I want the tool record the timestamp when the item added to the backlog so that I can know how long a item has been living in the backlog.
 As a product owner, I want to modify the undone items so that it can reflect my understanding to the requirement timely
 As a product owner, I want to change the item from done to undone so that I can handle some exceptional cases such as I mark it done by mistake or some new works introduced to the old item.
 As a user, I want to undo my changes so that I can recover my wrong operation quickly.

@@ -4,4 +4,6 @@
 2. To do automatic compile after commit
   - To detect if src file changed
 
+3. To check the change in GUI
+  - gitk [file]
 
