@@ -1,3 +1,4 @@
 It's a project about input Chinese into Linux
 I start the project to study Linux and Agile. I will utilize Agile practice during the development. Moreover, I will try to record my Linux programming study during the developing process.
 
+If you want component continous integration run after each commit, please copy git-howto/post-commit.sample to .git/hooks/post-commit 
