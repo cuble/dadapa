@@ -1,5 +1,6 @@
 #This is a script designed to do component continous integration
 
 echo "component-ci was executed"
+git show HEAD|grep src/
 
 
