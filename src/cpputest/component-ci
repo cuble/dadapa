@@ -28,7 +28,7 @@ if [ $? -eq 0 ]; then
   #echo "cpputest already checkout, update it"
   cur_date=`date +%Y%m`
   last_update_date=`cat $LAST_CHANGE`
-  [ $cur_date -eq $last_update_date ] && exit 0||do_update
+  [ $cur_date -eq $last_update_date ]&&echo "cpputest is up to date"||do_update
 else
   #echo "cpputest not checkout yet, checkout it"
   svn co $CPPUTEST_URL .
