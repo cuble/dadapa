@@ -1,4 +1,6 @@
 src/cpputest/*
 !src/cpputest/component-ci
+
 *.o
+*.pyc
 
