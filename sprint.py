@@ -11,6 +11,7 @@ class sprintDir:
         self.__name=SprintDirPrefix+str(n)
         self.__state = 'unavailable'
         self.__docs = []
+        for f in self.fileList: self.__docs.append(sprintDoc(f))
         
     def getname(self):
         return self.__name
@@ -26,9 +27,8 @@ class sprintDir:
     def initialize(self):
         os.mkdir(self.__name)
         os.chdir(self.__name)
-        for fname in self.fileList: 
-            f=open(fname, 'w+')
-            f.close()
+        for doc in self.__docs:
+            doc.initialize()
         os.chdir('..')
         pass
 
@@ -91,11 +91,33 @@ class SprintDocTests(unittest.TestCase):
         self._exist_doc_test('123', 'undefined')
         
     def test_check_exist_backlog(self):
-        self._exist_doc_test('sprint_backlog', 'new')        
+        self._exist_doc_test('sprint_backlog', 'new')
+        
+    def test_check_exist_review(self):
+        self._exist_doc_test('sprint_review', 'new')
+
+def init_stub(self, fname):
+    sprintDocStub.createdList.append(fname)
+    
+def clear_stub():
+    sprintDocStub.createdList = []
+    
+def initialize_stub(self):
+    pass
+
+def check_stub(self):
+    pass
 
 class sprintDocStub:
+    createdList = []
     def __init__(self, fname):
+        #print "stub called"
+        self.createdList.append(fname)
         pass
+
+        
+    def clear(self):
+        self.createdList=[]
 
     def set_state(self, state):
         pass
@@ -108,7 +130,7 @@ class SprintDirTests(unittest.TestCase):
         sprint._sprintDir__docs.append(doc)
         # os.chdir('..')
 
-    def _createTestSprint(self, dirname, status):
+    def _create_test_sprint(self, dirname, status):
         os.mkdir(dirname)
         if status == 'CreateNew': 
             self._attach_file(self.sprint, 'sprint_backlog')
@@ -122,48 +144,62 @@ class SprintDirTests(unittest.TestCase):
             # f=open(dirname+'/123', 'w+')
             # f.close()
 
-    def _initTestData(self, n, createType=''):
+    def _init_test_data(self, n, createType=''):
         self.testIdx=n
-        self.sprint=sprintDir(self.testIdx)
-        if createType != '': self._createTestSprint(self.sprint.getname(), createType)
+        self.sprint=sprintDir(n)
+        if createType != '': self._create_test_sprint(self.sprint.getname(), createType)
+
+    def _set_sprintDoc_stub(self):
+        self.orig_init=sprintDoc.__init__ 
+        self.orig_initialize=sprintDoc.initialize
+        sprintDoc.__init__ = init_stub
+        sprintDoc.initialize=initialize_stub
 
     def setUp(self):
-        self._initTestData(0)
+        self._set_sprintDoc_stub()
         self.dirBeforeTest=os.listdir('.')
         self.curdir=os.getcwd()
 
+    def _clear_sprintDoc_stub(self):
+        sprintDoc.__init__ = self.orig_init
+        sprintDoc.initialize = self.orig_initialize
+        clear_stub()
+        
     def tearDown(self):
+        self._clear_sprintDoc_stub()
         if(os.path.isdir(self.sprint.getname())): shutil.rmtree(self.sprint.getname())
         self.assertEqual(self.curdir,os.getcwd(),"pwd change not allowed")
         self.assertEqual(self.dirBeforeTest, os.listdir('.'), "files change not allowed")
 
-    def testCheckNotexist(self):
+    def test_check_not_exist(self):
+        self._init_test_data(0)
         self.assertEqual("unavailable",self.sprint.check())
+        self.assertEqual(sprintDir.fileList, sprintDocStub.createdList)
         
-    def _createNewCheck(self, n=0):
-        self._initTestData(n)
+    def _create_new_check(self, n=0):
+        self._init_test_data(n)
         self.sprint.initialize()
         self.assertEqual(SprintDirPrefix+str(self.testIdx), self.sprint.getname())
         self.assertTrue(os.path.isdir(self.sprint.getname()))
         self.assertEqual('new', self.sprint.check())
-        self.assertEqual(self.sprint.fileList, os.listdir(self.sprint.getname()))
-        
-    def testCreateNew(self):
-        self._createNewCheck()
-        
-    def testCreateAnother(self):
-        self._createNewCheck(1)
+        self.assertEqual(sprintDir.fileList, sprintDocStub.createdList)
 
-    def testCheckExistNewSprint(self):
-        self._initTestData(1,'CreateNew')
+    def test_create_new(self):
+        self._create_new_check()
+        
+    def test_create_another(self):
+        self._create_new_check(1)
+
+    def test_check_exist_new_sprint(self):
+        self._init_test_data(1,'CreateNew')
         self.assertEqual('new', self.sprint.check())
 
-    def testCheckExistEmpty(self):
-        self._initTestData(1,'CreateEmpty')
+    def test_check_exist_empty(self):
+        self._init_test_data(1,'CreateEmpty')
         self.assertEqual('undefined', self.sprint.check())
         
-    def testCheckExitWrong(self):
-        self._initTestData(1, 'CreateWrong')
+    def test_check_exist_wrong(self):
+        self._init_test_data(1, 'CreateWrong')
         self.assertEqual('undefined', self.sprint.check())
         
 
