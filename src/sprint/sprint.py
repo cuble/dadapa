@@ -19,9 +19,10 @@ class sprintDir:
     def check(self):
         if os.path.isdir(self.__name): 
             self.__state='new'
-            for filename in self.fileList:
-                if filename not in os.listdir(self.__name): 
-                    self.__state='undefined'
+            for doc in self.__docs:
+                if doc.check() != 'new': 
+                    self.__state = 'undefined'
+                    break
         return self.__state
         
     def initialize(self):
