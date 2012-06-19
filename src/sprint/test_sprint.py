@@ -96,7 +96,6 @@ class sprintDocStub:
         
     @classmethod
     def set_expected_check_result(self, *val):
-        print val
         self.checkExpectedCallTime = len(val)
         self.checkReturnVal = val
         
