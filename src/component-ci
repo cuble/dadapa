@@ -2,7 +2,7 @@
 # This is a script designed to do component continous integration
 
 # add subproject to projects
-projects="cpputest backlog-editor"
+projects="cpputest backlog-editor sprint"
 prj_root=`pwd`
 for prj in $projects; do 
   echo "--------runing $prj cci--------"

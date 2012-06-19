@@ -3,4 +3,5 @@ src/cpputest/*
 
 *.o
 *.pyc
+./sprint.py
 
