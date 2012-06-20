@@ -107,7 +107,7 @@ class SprintDirTests(unittest.TestCase):
     def _create_test_sprint(self, dirname, status):
         os.mkdir(dirname)
         if status == 'CreateNew': 
-            sprintDocStub.set_expected_check_result(*('new','new'))
+            sprintDocStub.set_expected_check_result('new','new')
         elif status == 'CreateEmpty': 
             sprintDocStub.set_expected_check_result('unavailable')
         elif status == 'CreateWrong': 
@@ -137,7 +137,7 @@ class SprintDirTests(unittest.TestCase):
         
     def _create_new_check(self, n=0):
         self._init_test_data(n)
-        sprintDocStub.set_expected_check_result(*('new','new'))
+        sprintDocStub.set_expected_check_result('new','new')
         self.sprint.initialize()
         self.assertEqual(SprintDirPrefix+str(self.testIdx), self.sprint.getname())
         self.assertTrue(os.path.isdir(self.sprint.getname()))
