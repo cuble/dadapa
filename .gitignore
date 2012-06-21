@@ -5,3 +5,7 @@ src/cpputest/*
 *.pyc
 sprint.py
 
+src/.metadata/
+src/sprint/.project
+src/sprint/.pydevproject
+
