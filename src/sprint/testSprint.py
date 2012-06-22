@@ -1,51 +1,38 @@
 #! /usr/bin/env python
+
 import unittest
 
 from sprint import sprintDoc
 from sprint import sprintDir
 from sprint import sprint_main
+from sprint import helpString 
 
 from sprintStub import sprintDocStub
+from sprintStub import sprintDirStub
 from sprintStub import osStub
+from sprintStub import fileIoStub
 
-import os # will be removed after stub done
+import sys
+from cStringIO import StringIO
 
 class SprintDocTests(unittest.TestCase):
     def setUp(self):
-        self.dirBeforeTest = os.listdir('.')
-        self.curdir = os.getcwd()
+        osStub.install()
+        fileIoStub.install()
 
     def tearDown(self):
-        self.assertEqual(self.curdir, os.getcwd(), "pwd change not allowed")
-        self.assertEqual(self.dirBeforeTest, os.listdir('.'), "files change not allowed")
-
+        osStub.uninstall()
+        fileIoStub.uninstall()
+        
     def test_doc_notexist(self):
         self.doc = sprintDoc('123')
+        osStub.set_expected_isfile_result('123', False)
         self.assertEqual('unavailable', self.doc.check())
-        
-    def test_initialize_unknown_doc(self):
-        self.doc = sprintDoc('123')
-        self.assertRaises(NameError, self.doc.initialize)
-
-    def _initialize_doc_test(self, fname, filestate):
-        self.doc = sprintDoc(fname)
-        self.doc.initialize()
-        self.assertEqual(filestate, self.doc.check())
-        self.assertTrue(os.path.isfile(self.doc._sprintDoc__name))
-        os.remove(self.doc._sprintDoc__name)
-
-    def test_initialize_backlog(self):
-        self._initialize_doc_test('sprint_backlog', 'new')
-        
-    def test_initialize_review(self):
-        self._initialize_doc_test('sprint_review', 'new')
         
     def _exist_doc_test(self, fname, filestate):
         self.doc = sprintDoc(fname)
-        f = open(fname, 'w+')
-        f.close()
+        osStub.set_expected_isfile_result(fname, True)
         self.assertEqual(filestate, self.doc.check())
-        os.remove(fname)
     
     def test_check_exist_unknown_doc(self):
         self._exist_doc_test('123', 'undefined')
@@ -56,15 +43,32 @@ class SprintDocTests(unittest.TestCase):
     def test_check_exist_review(self):
         self._exist_doc_test('sprint_review', 'new')
 
+    def test_initialize_unknown_doc(self):
+        self.doc = sprintDoc('123')
+        self.assertRaises(NameError, self.doc.initialize)
+
+    def _initialize_doc_test(self, fname):
+        self.doc = sprintDoc(fname)
+        fileIoStub.set_expected_open(fname, 'w+')
+        self.doc.initialize()
+        fileIoStub.check_created_files(fname, [])
+
+    def test_initialize_backlog(self):
+        self._initialize_doc_test('sprint_backlog')
+        
+    def test_initialize_review(self):
+        self._initialize_doc_test('sprint_review')
         
 class SprintDirTests(unittest.TestCase):
     def _new_sprintDir(self, sprintNum):
         self.testIdx = sprintNum
-        self.sprint = sprintDir(sprintNum)
         self.sprintName = sprintDir.prefix + str(sprintNum)
+        sprintDocStub.set_expected_check_dir(self.sprintName)
+        self.sprint = sprintDir(sprintNum)
+        
         self.assertEqual(self.sprintName, self.sprint.getname())
         self.assertEqual(sprintDir.fileList, sprintDocStub.createdList)
-        sprintDocStub.check_created_result(self.assertEqual, sprintDir.fileList)
+        sprintDocStub.check_objs_created_result(sprintDir.fileList)
 
     def _init_test_data(self, sprintNum, isDirExist):
         self._new_sprintDir(sprintNum)
@@ -89,24 +93,24 @@ class SprintDirTests(unittest.TestCase):
 
     def test_check_exist_empty(self):
         self._init_test_data(1, True)
-        sprintDocStub.set_expected_check_result(self.sprintName, 'unavailable')
+        sprintDocStub.set_expected_check_result('unavailable')
         self._do_check('undefined')
         
     def test_check_exist_new_sprint(self):
         self._init_test_data(1, True)
-        sprintDocStub.set_expected_check_result(self.sprintName, 'new', 'new')
+        sprintDocStub.set_expected_check_result('new', 'new')
         self._do_check('new')
 
     def test_check_exist_wrong(self):
         self._init_test_data(1, True)
-        sprintDocStub.set_expected_check_result(self.sprintName, 'undefined')
+        sprintDocStub.set_expected_check_result('undefined')
         self._do_check('undefined')
 
     def _do_initialize(self, sprintNum=0):
         self._init_test_data(sprintNum, False)
         self.sprint.initialize()
-        osStub.check_dir_created(self.assertEqual, self.sprintName)
-        sprintDocStub.check_initialized_result(self.assertEqual, sprintDir.fileList)
+        osStub.check_dir_created(self.sprintName)
+        sprintDocStub.check_initialized_result(sprintDir.fileList)
 
     def test_initialize(self):
         self._do_initialize()
@@ -115,9 +119,42 @@ class SprintDirTests(unittest.TestCase):
         self._do_initialize(1)
 
 
-class SprintMainTest(unittest.TestCase):        
-    def test_main(self):
+
+class SprintMainTest(unittest.TestCase):
+    def setUp(self):
+        sprintDirStub.install()
+        sys.argv = ['-']
+        self.org_output = sys.stdout
+        sys.stdout = StringIO()
+        
+    def tearDown(self):
+        sprintDirStub.uninstall()
+        sys.stdout = self.org_output
+        
+    def _sprint_main_test(self, *argvs):
+        length = len(argvs)
+        for index in range(length):
+            sys.argv.append(argvs[index])
         sprint_main()
+        sprintDirStub.check_called(argvs[0])
+        sprintDirStub.check_objs_created(argvs[1])
+
+        
+    def test_print_help_if_no_param(self):
+        sprint_main()
+        sprintDirStub.check_objs_created()
+        sprintDirStub.check_called()
+        self.assertEqual(helpString+'\n', sys.stdout.getvalue())
+               
+    def test_check_sprint(self):
+        self._sprint_main_test('check', '1')
+        
+    def test_check_another_sprint(self):
+        self._sprint_main_test('check', '2')
+        
+    def test_intialize_sprint(self):
+        self._sprint_main_test('initialize', '1')
+
 
 def main():
     unittest.main()

@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+
 import os
 
 class sprintDir:
@@ -44,11 +45,28 @@ class sprintDoc:
         
     def initialize(self):
         if self.__name not in sprintDir.fileList: raise NameError(self.__name)
-        f = open(self.__name, 'w+')
+        f = self.open_file(self.__name, 'w+')
         f.close()
+        
+    def open_file(self, fname, flag):
+        return open(fname, flag)
 
+helpString = """Usage: sprint operation [param]
+    sprint new
+    sprint delete
+    sprint check 1
+    sprint initialize 1"""
 def sprint_main():
-    pass
+    import sys
+    if len(sys.argv) == 1:
+        print helpString
+        return
+    sprintNum = sys.argv[2]
+    sprint = sprintDir(sprintNum)
+    if sys.argv[1] == 'check': 
+        sprint.check()
+    else:
+        sprint.initialize()
 
 if __name__ == '__main__':
     sprint_main()
