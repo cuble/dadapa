@@ -82,13 +82,18 @@ class sprintDirStub:
     org_check = sprintDir.check
     org_init = sprintDir.__init__
     org_initialize = sprintDir.initialize
+    org_delete = sprintDir.delete
+    org_get_last_num = sprintDir.get_last_num
     calledFuncList = []
     objsCreated = []
+    expectedLastNum = 0
     @classmethod
     def install(cls):
         sprintDir.check = sprint_check_stub
         sprintDir.__init__ = sprint_init_stub
         sprintDir.initialize = sprint_initialize_stub
+        sprintDir.delete = sprint_delete_stub
+        sprintDir.get_last_num = classmethod(sprint_get_last_num_stub)
         cls.calledFuncList = []
         cls.objsCreated = []
     
@@ -97,7 +102,12 @@ class sprintDirStub:
         sprintDir.check = cls.org_check
         sprintDir.__init__ = cls.org_init
         sprintDir.initialize = cls.org_initialize
-    
+        sprintDir.get_last_num = cls.org_get_last_num
+        
+    @classmethod
+    def set_expected_last_num(cls, num):
+        cls.expectedLastNum = num
+
     @classmethod
     def check_called(cls, *expectedFuncList):
         length = len(expectedFuncList)
@@ -120,7 +130,12 @@ def sprint_init_stub(self,sprintNum):
            
 def sprint_initialize_stub(self):
     sprintDirStub.calledFuncList.append("initialize")
+    
+def sprint_delete_stub(self):
+    sprintDirStub.calledFuncList.append("delete")
 
+def sprint_get_last_num_stub(cls):
+    return sprintDirStub.expectedLastNum
 
 class osStub:
     org_mkdir = os.mkdir
@@ -157,11 +172,6 @@ class osStub:
         os.path.isdir = cls.org_isdir
         os.path.isfile = cls.org_isfile
 
-    @classmethod
-    def set_expected_isdir_result(cls, path, ret):
-        osStub.curDir = ""
-        cls.isdirPath = path
-        cls.isdirReturnVal = ret
         
     @classmethod
     def check_dir_created(cls, *dirs):
@@ -171,9 +181,11 @@ class osStub:
             assert_equal(dirs[index], cls.createdDirList[index])
             
     @classmethod
-    def set_expected_isfile_result(cls, name, ret):
-        cls.isfileName = name
-        cls.isfileReturnVal = ret
+    def set_created_dir_list(cls, *dirs):
+        length = len(dirs)
+        for index in range(length): 
+            cls.createdDirList.append(dirs[index])
+            
 
 def mkdir_stub(path):
     assert_equal(osStub.curDir, "")
@@ -184,20 +196,16 @@ def chdir_stub(path):
     else: osStub.curDir = path
 
 def isdir_stub(path):
-    assert_equal(osStub.curDir, "")
-    assert_equal(path, osStub.isdirPath)
-    return osStub.isdirReturnVal
+    return path in osStub.createdDirList
 
 def isfile_stub(name):
-    assert_equal(osStub.isfileName, name)
-    return osStub.isfileReturnVal
+    return name in fileIoStub.createdFiles.keys()
 
 
 class fileIoStub:
     org_open_file = sprintDoc.open_file
-    expectedOpenFile = ""
-    expectedOpenFlag = ""
     createdFiles = {}
+    
     @classmethod
     def install(cls):
         sprintDoc.open_file = open_stub
@@ -208,20 +216,21 @@ class fileIoStub:
     @classmethod
     def uninstall(cls):
         sprintDoc.open_file = cls.org_open_file
-    
-    @classmethod
-    def set_expected_open(cls, fileName, flag):
-        cls.expectedOpenFile = fileName
-        cls.expectedOpenFlag = flag
         
     @classmethod
     def check_created_files(cls, fname, contents):
         assert_equal(cls.createdFiles[fname], contents)
             
+    @classmethod
+    def set_exist_file(cls, fname, contents):
+        cls.createdFiles[fname] = contents
+        
 def open_stub(self, fileName, flag):
-    assert_equal(fileIoStub.expectedOpenFile, fileName)
-    assert_equal(fileIoStub.expectedOpenFlag, flag)
-    return fileStub(fileName)
+    f = fileStub(fileName)
+    if flag == 'w+': pass
+    elif flag == 'r': 
+        f.writelines(fileIoStub.createdFiles[fileName])
+    return f
     
 class fileStub:
     def __init__(self, name):
@@ -230,3 +239,9 @@ class fileStub:
 
     def close(self):
         fileIoStub.createdFiles[self.name]=self.content
+        
+    def writelines(self, contents):
+        self.content = self.content + contents
+        
+    def __iter__(self):
+        return self.content.__iter__()
