@@ -1,7 +1,16 @@
-1. As a developer I want a script to create new sprint folder&file structure automatically for convienient and formated.
+1. As a developer I want a script to create new sprint folder&file structure automatically for convenient and formated.
 
-2. As a developer I want to remove the newly created sprint folder in case it's created by mistake for convienient.
+2. As a developer I want to remove the newly created sprint folder in case it's created by mistake for convenient.
 
-3. As a developer I want to check the state of exist sprint folders and create missed files for convienient.
+3. As a developer I want to check the state of exist sprint folders and create missed files for convenient.
 
 4. As a developer I want the script can't remove my worked sprint for safe.
+
+Not Done Items:
+1. As a developer I want the script to add sprint period automatically for convenient
+
+2. As a developer I want the script can automatically index sprint items for convenient. 
+
+3. As a python programmer I want a unittest framework to automatically install registered stub classes in setup, automatically uninstall them in teardown for convenient and error free when doing TDD.
+
+ 
