@@ -62,7 +62,9 @@ class sprintDir:
         return lastSprintNum
 
 class sprintDoc:
-    templates = {'sprint_backlog': ["Committed Items:\n", 
+    templates = {'sprint_backlog': ["Period:\n",
+                                    "\n",
+                                    "Committed Items:\n", 
                                     "\n",
                                     "Not Committed Items:\n",
                                     "\n"],

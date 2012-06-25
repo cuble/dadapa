@@ -1,0 +1,7 @@
+1. As a developer I want a script to create new sprint folder&file structure automatically for convienient and formated.
+
+2. As a developer I want to remove the newly created sprint folder in case it's created by mistake for convienient.
+
+3. As a developer I want to check the state of exist sprint folders and create missed files for convienient.
+
+4. As a developer I want the script can't remove my worked sprint for safe.

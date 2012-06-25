@@ -38,7 +38,8 @@ class SprintDocTests(unittest.TestCase):
         self._exist_doc_test('123', 'undefined')
         
     def test_check_exist_backlog(self):
-        fileIoStub.set_exist_file('sprint_backlog', ['Committed Items:\n','\n',\
+        fileIoStub.set_exist_file('sprint_backlog', ['Period:\n','\n',
+                                                     'Committed Items:\n','\n',\
                                                      'Not Committed Items:\n', '\n'])
         self._exist_doc_test('sprint_backlog', 'new')
         
