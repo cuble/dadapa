@@ -1,51 +1,64 @@
 #! /usr/bin/env python
 
 import os
+import shutil
 
 class sprintDir:
     prefix = 'Sprint-'
     fileList = ['sprint_backlog', 'sprint_review']
     def __init__(self, n):
         self.__name = sprintDir.prefix + str(n)
-        self.__state = 'unavailable'
         self.__docs = []
         for f in self.fileList: self.__docs.append(sprintDoc(f))
         
     def getname(self):
         return self.__name
         
-    def check(self):
-        state = 'unavailable'
+    def check(self, createMissedFiles=True):
+        sprint_state = 'unavailable'
         if os.path.isdir(self.__name):
+            sprint_state=state = 'new' 
             os.chdir(self.__name)
-            state = 'new' 
             for doc in self.__docs:
                 state = doc.check()
-                if state == 'unavailable': state='undefined'
-                if state != 'new': break
-        os.chdir("..")
-        print 'The state of {} is: {}'.format(self.__name, state)
-        return state
+                if state == 'unavailable' and createMissedFiles:
+                    doc.initialize() 
+                elif state == 'worked': 
+                    sprint_state = state
+                elif state == 'undefined': break
+                state = 'new' 
+            os.chdir("..")
+            if state != 'new': sprint_state = state
+        print '{0} is: {1}'.format(self.__name, sprint_state)
+        return sprint_state
         
     def initialize(self):
         if os.path.isdir(self.__name):
-            print "{} exist, can't be initialized".format(self.__name)
+            print "{0} exist, can't be initialized".format(self.__name)
         else:
             os.mkdir(self.__name)
+            print "{0} created".format(self.__name)
             os.chdir(self.__name)
             for doc in self.__docs:
                 doc.initialize()
             os.chdir('..')
 
     def delete(self):
-        pass
+        state = self.check(False)
+        if state == 'new':
+            shutil.rmtree(self.__name)
+            print "{0} deleted".format(self.__name)
+        if state == 'worked': print "Delete FORBIDDEN!"
 
     @classmethod
     def get_last_num(cls):
         lastSprintNum = 0
         dirList = os.listdir('.')
         for dirName in dirList:
-            print dirName
+            if not os.path.isdir(dirName) or dirName.rfind(sprintDir.prefix) == -1: continue
+            sprintNum = dirName[len(sprintDir.prefix):]
+            if int(sprintNum) > lastSprintNum: 
+                lastSprintNum = int(sprintNum)
         return lastSprintNum
 
 class sprintDoc:
@@ -77,15 +90,15 @@ class sprintDoc:
         f = self.open_file(self.__name, 'w+')
         f.writelines(self.templates[self.__name])
         f.close()
+        print "- {0} created".format(self.__name)
         
     def open_file(self, fname, flag):
         return open(fname, flag)
 
-helpString = """Usage: sprint operation [param]
+helpString = """Usage: sprint operation [param]. Examples:
     sprint new
     sprint delete [1]
-    sprint check 1
-    sprint initialize 1"""
+    sprint check 1"""
 def sprint_main():
     import sys
     def do_check():
@@ -109,11 +122,13 @@ def sprint_main():
     if len(sys.argv) == 1 or sys.argv[1] not in cmdTable.keys():
         return print_help()
     
-    if len(sys.argv) > 2: sprintNum = sys.argv[2]
+    if len(sys.argv) > 2: 
+        if sys.argv[1] == 'new': return print_help()
+        sprintNum = sys.argv[2]
     elif sys.argv[1] in ['initialize', 'check']: return print_help()
-    else: sprintNum = sprintDir.get_last_num() + 1
+    elif sys.argv[1] == 'new': sprintNum = sprintDir.get_last_num() + 1
+    else: sprintNum = sprintDir.get_last_num()
     sprint = sprintDir(sprintNum)
-
     cmdTable[sys.argv[1]]()
 
 if __name__ == '__main__':

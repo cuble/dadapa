@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import os
+import shutil
 from sprint import sprintDoc
 from sprint import sprintDir
 
@@ -17,7 +18,7 @@ class sprintDocStub:
     expectedCheckCallTime = 0
     checkCalledTime = 0
     expectedCheckDir = ""
-    initialize_called_time = 0
+
 
     @classmethod
     def install(cls):
@@ -41,13 +42,13 @@ class sprintDocStub:
         cls.expectedCheckCallTime = 0
         cls.checkCalledTime = 0
         cls.expectedCheckDir = ""
-        cls.initialize_called_time = 0
 
     @classmethod
     def uninstall(cls):
         sprintDoc.__init__ = cls.org_init
         sprintDoc.initialize = cls.org_initialize
         sprintDoc.check = cls.org_check
+        assert_equal(cls.expectedCheckCallTime, cls.checkCalledTime)
         
     @classmethod
     def set_expected_check_dir(cls, checkDir):
@@ -57,25 +58,20 @@ class sprintDocStub:
     def set_expected_check_result(cls, *val):
         cls.expectedCheckCallTime = len(val)
         cls.expectedCheckReturnVal = val
-        
-    @classmethod
-    def check_checked_time(cls, func):
-        func(cls.expectedCheckCallTime, cls.checkCalledTime)
-
+                
 def init_stub(self, fname):
     sprintDocStub.createdList.append(fname)
+    self.name=fname
     
 def initialize_stub(self):
     assert_equal(osStub.curDir, sprintDocStub.expectedCheckDir)
-    sprintDocStub.initializedList.append(sprintDocStub.createdList[sprintDocStub.initialize_called_time])
-    sprintDocStub.initialize_called_time = sprintDocStub.initialize_called_time + 1 
+    sprintDocStub.initializedList.append(self.name) 
 
 def check_stub(self):
     assert_equal(osStub.curDir, sprintDocStub.expectedCheckDir)
     result = sprintDocStub.expectedCheckReturnVal[sprintDocStub.checkCalledTime]
     sprintDocStub.checkCalledTime = sprintDocStub.checkCalledTime + 1
     return result
-
 
 
 class sprintDirStub:
@@ -142,19 +138,25 @@ class osStub:
     org_chdir = os.chdir
     org_isdir = os.path.isdir
     org_isfile = os.path.isfile
+    org_listdir = os.listdir
     isdirReturnVal = False
     isdirPath = ""
     isfileReturnVal = False
     isfileName = ""
     createdDirList = []
     curDir = ""
+    rmed_dir = ""
+
     @classmethod
     def install(cls):
         os.mkdir = mkdir_stub
         os.chdir = chdir_stub
         os.path.isdir = isdir_stub
         os.path.isfile = isfile_stub
+        os.listdir = listdir_stub
+        shutil.rmtree = rmtree_stub
         cls.clear()
+        fileIoStub.clear()
 
     @classmethod
     def clear(cls):
@@ -164,14 +166,14 @@ class osStub:
         cls.isfileName = ""
         cls.createdDirList = []
         cls.curDir = ""
-        
+        cls.rmed_dir = ""
     @classmethod
     def uninstall(cls):
         os.mkdir = cls.org_mkdir
         os.chdir = cls.org_chdir
+        os.listdir = cls.org_listdir
         os.path.isdir = cls.org_isdir
         os.path.isfile = cls.org_isfile
-
         
     @classmethod
     def check_dir_created(cls, *dirs):
@@ -185,22 +187,33 @@ class osStub:
         length = len(dirs)
         for index in range(length): 
             cls.createdDirList.append(dirs[index])
-            
 
+    @classmethod
+    def check_rmtree_called(cls, path):
+        assert_equal(path, cls.rmed_dir)
+
+            
 def mkdir_stub(path):
     assert_equal(osStub.curDir, "")
     osStub.createdDirList.append(path)
 
 def chdir_stub(path):
-    if('..' == path): osStub.curDir = ""
+    if '..' == path:
+        if osStub.curDir == "": raise NameError(path) 
+        else: osStub.curDir = ""
     else: osStub.curDir = path
 
 def isdir_stub(path):
-    return path in osStub.createdDirList
+    return (path in osStub.createdDirList)
 
 def isfile_stub(name):
     return name in fileIoStub.createdFiles.keys()
 
+def listdir_stub(path):
+    return osStub.createdDirList + fileIoStub.createdFiles.keys()
+
+def rmtree_stub(path):
+    osStub.rmed_dir = path
 
 class fileIoStub:
     org_open_file = sprintDoc.open_file
@@ -209,10 +222,14 @@ class fileIoStub:
     @classmethod
     def install(cls):
         sprintDoc.open_file = open_stub
+        cls.clear()
+        
+    @classmethod
+    def clear(cls):
         cls.expectedOpenFile = ""
         cls.expectedOpenFlag = ""
         cls. createdFiles = {}
-        
+                
     @classmethod
     def uninstall(cls):
         sprintDoc.open_file = cls.org_open_file
@@ -245,3 +262,24 @@ class fileStub:
         
     def __iter__(self):
         return self.content.__iter__()
+
+import sys
+from cStringIO import StringIO
+
+class sysOutputStub:
+    org_stdout = sys.stdout
+    @classmethod
+    def install(cls):
+        sys.stdout = StringIO()
+        
+    @classmethod
+    def uninstall(cls):
+        assert_equal ('', sys.stdout.getvalue())
+        sys.stdout = cls.org_stdout
+        
+    @classmethod
+    def check_sys_output(cls, desired_output):
+        assert_equal(desired_output, sys.stdout.getvalue())
+        sys.stdout = StringIO() #clear the output after check
+        
+        
