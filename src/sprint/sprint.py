@@ -101,17 +101,29 @@ helpString = """Usage: sprint operation [param]. Examples:
     sprint check 1"""
 def sprint_main():
     import sys
-    def do_check():
-        sprint.check()
+    def do_check(op='run'):
+        if op == 'check_param': 
+            if len(sys.argv)>2: return sys.argv[2] 
+            return 'Param_Error'
+        else: sprint.check()
         
-    def do_initialize():
-        sprint.initialize()
+    def do_initialize(op='run'):
+        if op == 'check_param':
+            if len(sys.argv)>2: return sys.argv[2] 
+            return 'Param_Error'
+        else: sprint.initialize()
 
-    def do_new():
-        sprint.initialize()
+    def do_new(op='run'):
+        if op == 'check_param':
+            if len(sys.argv)>2: return 'Param_Error'
+            return sprintDir.get_last_num() + 1
+        else: sprint.initialize()
     
-    def do_delete():
-        sprint.delete()
+    def do_delete(op='run'):
+        if op == 'check_param':
+            if len(sys.argv)>2: return sys.argv[2] 
+            return sprintDir.get_last_num()
+        else: sprint.delete()
         
     def print_help():
         print helpString
@@ -122,12 +134,8 @@ def sprint_main():
     if len(sys.argv) == 1 or sys.argv[1] not in cmdTable.keys():
         return print_help()
     
-    if len(sys.argv) > 2: 
-        if sys.argv[1] == 'new': return print_help()
-        sprintNum = sys.argv[2]
-    elif sys.argv[1] in ['initialize', 'check']: return print_help()
-    elif sys.argv[1] == 'new': sprintNum = sprintDir.get_last_num() + 1
-    else: sprintNum = sprintDir.get_last_num()
+    sprintNum = cmdTable[sys.argv[1]]('check_param')
+    if sprintNum == 'Param_Error': return print_help()
     sprint = sprintDir(sprintNum)
     cmdTable[sys.argv[1]]()
 
