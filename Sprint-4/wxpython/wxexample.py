@@ -13,10 +13,11 @@ class myFrame(wx.Frame):
         
         filemenu = wx.Menu()
         
-        menuItem=filemenu.Append(wx.ID_ABOUT, "&About", " Information about this program")
-        self.Bind(wx.EVT_MENU, self.OnAbout, menuItem)
+        menuAbout = filemenu.Append(wx.ID_ABOUT, "&About", " Information about this program")
+        self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         filemenu.AppendSeparator()
-        filemenu.Append(wx.ID_EXIT, "E&xit", " Terminate the program")
+        menuExit = filemenu.Append(wx.ID_EXIT, "E&xit", " Terminate the program")
+        self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         
         menuBar = wx.MenuBar()
         menuBar.Append(filemenu, "&File")
@@ -25,6 +26,9 @@ class myFrame(wx.Frame):
         
     def OnAbout(self, event):
         about=aboutBox(self, "About Sample Editor")
+
+    def OnExit(self, event):
+        self.Close(True)
 
 app = wx.App(False)
 frame = myFrame(None, "Sample Editor")
