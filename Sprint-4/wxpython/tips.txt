@@ -1,0 +1,4 @@
+1. the event will stop after the callback finishes. However, you can "skip" an event with event.Skip() to make it go through the hierarchy of event handlers.	
+
+2. 
+
