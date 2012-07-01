@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import wx
 import os
 
@@ -10,7 +12,10 @@ class myFrame(wx.Frame):
         filemenu = wx.Menu()
 
         menuOpen = filemenu.Append(wx.ID_OPEN, "&Open", " Open a file")
-	self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
+        self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
+        
+        menuSave = filemenu.Append(wx.ID_SAVE, "&Save", " Save file")
+        self.Bind(wx.EVT_MENU, self.OnSave, menuSave)
         
         menuAbout = filemenu.Append(wx.ID_ABOUT, "&About", " Information about this program")
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
@@ -31,17 +36,23 @@ class myFrame(wx.Frame):
     def OnExit(self, event):
         self.Close(True)
 
-    def OnOpen(self,e):
+    def OnOpen(self,event):
         """ Open a file"""
-        self.dirname = ''
-        dlg = wx.FileDialog(self, "Choose a file", self.dirname, "", "*.*", wx.OPEN)
+        self.dirname = os.environ['PWD']
+        dlg = wx.FileDialog(self, "Choose a file", self.dirname, "", "*.txt", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
-	    self.filename = dlg.GetFilename()
-	    self.dirname = dlg.GetDirectory()
-	    f = open(os.path.join(self.dirname, self.filename), 'r')
-	    self.control.SetValue(f.read())
-	    f.close()
+            self.path = dlg.GetPath()
+            if self.path : 
+                f = open(self.path, 'r')
+                self.control.SetValue(f.read())
+                f.close()
         dlg.Destroy()
+        
+    def OnSave(self, event):
+        f=open(self.path, 'w+')
+        f.write(self.control.GetValue())
+        f.close()
+        
 
 app = wx.App(False)
 frame = myFrame(None, "Sample Editor")
