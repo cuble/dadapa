@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-import wx
 import os
+import wx
+from wx.lib.wordwrap import wordwrap
 
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -29,9 +30,18 @@ class myFrame(wx.Frame):
         self.Show(True)
         
     def OnAbout(self, event):
-        dlg = wx.MessageDialog(self, "A small text editor", "About Sample Editor", wx.OK)
-        dlg.ShowModal()
-	dlg.Destroy()
+        info = wx.AboutDialogInfo()
+        info.Name = "Sample Editor"
+        info.Version = "0.1.0"
+        info.Copyright = "(C) 2012 Programmers and Coders Everywhere"
+        info.Description = wordwrap(
+        'The "Sample Editor" is my wxPython study example for my backlog-viewer'
+        'I will try needed features in this simple project'
+        'Then try to confirm the architecture of backlog-viewer',
+        350, wx.ClientDC(self))
+        info.WebSite = ("https://myspace.inside.nokiasiemensnetworks.com/Person.aspx?accountname=nsn-intra\g1cheng", "My Home Page")
+        info.Developers = ["Chen Gang"]        
+        wx.AboutBox(info)
 
     def OnExit(self, event):
         self.Close(True)
