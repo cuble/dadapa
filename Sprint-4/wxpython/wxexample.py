@@ -4,10 +4,36 @@ import os
 import wx
 from wx.lib.wordwrap import wordwrap
 
+class myPanel(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent)
+        
+        hSizer=wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.button=wx.Button(self, label="Clear", size=(70,30))
+        self.Bind(wx.EVT_BUTTON, self.onClear,self.button)
+        hSizer.Add(self.button,0)
+
+        self.checkBox=wx.CheckBox(self, label="Is it checked?")
+        self.Bind(wx.EVT_CHECKBOX, self.onCheckBox, self.checkBox)
+        hSizer.Add(self.checkBox, 0, wx.ALIGN_CENTER_VERTICAL)
+        
+        self.SetSizerAndFit(hSizer)
+        
+    def onClear(self, event):
+        self.Parent.onClear()
+
+    def onCheckBox(self, event):
+        self.Parent.onCheckBox(self.checkBox.GetValue())
+
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(800,600))
-        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+        self.panel = myPanel(self)
+        vSizer.Add(self.panel,0,wx.EXPAND)
+        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(600,600))
+        vSizer.Add(self.control,1, wx.EXPAND)
         self.CreateStatusBar()
         
         filemenu = wx.Menu()
@@ -27,6 +53,10 @@ class myFrame(wx.Frame):
         menuBar = wx.MenuBar()
         menuBar.Append(filemenu, "&File")
         self.SetMenuBar(menuBar)
+        self.SetSizerAndFit(vSizer)
+        # self.SetSizer(vSizer)
+        # self.SetAutoLayout(True)
+        # vSizer.Fit(self)
         self.Show(True)
         
     def OnAbout(self, event):
@@ -63,6 +93,12 @@ class myFrame(wx.Frame):
         f.write(self.control.GetValue())
         f.close()
         
+    def onClear(self):
+        self.control.SetValue("")
+        
+    def onCheckBox(self, isChecked):
+        if isChecked: self.control.AppendText("The checkBox Checked\n")
+        else: self.control.AppendText("The checkBox Unchecked\n")
 
 app = wx.App(False)
 frame = myFrame(None, "Sample Editor")
