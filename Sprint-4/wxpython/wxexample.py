@@ -29,6 +29,11 @@ class myPanel(wx.Panel):
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(800,600))
+        self.dirname = os.getcwdu()
+        self.path=''
+        if os.path.isfile('./wxpdemo.ico'):
+            self.ico = wx.Icon('wxpdemo.ico', wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.ico)
         vSizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = myPanel(self)
         vSizer.Add(self.panel,0,wx.EXPAND)
@@ -59,6 +64,10 @@ class myFrame(wx.Frame):
         # vSizer.Fit(self)
         self.Show(True)
         
+    def setFileName(self, name):
+        self.path = name
+        self.Title = name
+        
     def OnAbout(self, event):
         info = wx.AboutDialogInfo()
         info.Name = "Sample Editor"
@@ -78,10 +87,9 @@ class myFrame(wx.Frame):
 
     def OnOpen(self,event):
         """ Open a file"""
-        self.dirname = os.environ['PWD']
         dlg = wx.FileDialog(self, "Choose a file", self.dirname, "", "*.txt", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
-            self.path = dlg.GetPath()
+            self.setFileName(dlg.GetPath())
             if self.path : 
                 f = open(self.path, 'r')
                 self.control.SetValue(f.read())
@@ -89,6 +97,12 @@ class myFrame(wx.Frame):
         dlg.Destroy()
         
     def OnSave(self, event):
+        if self.path == '':
+            dlg = wx.FileDialog(self, "Save the file", self.dirname, "", "*.txt", wx.SAVE)
+            if dlg.ShowModal() == wx.ID_OK:
+                self.setFileName(dlg.GetPath())
+            else:
+                return             
         f=open(self.path, 'w+')
         f.write(self.control.GetValue())
         f.close()
@@ -100,7 +114,8 @@ class myFrame(wx.Frame):
         if isChecked: self.control.AppendText("The checkBox Checked\n")
         else: self.control.AppendText("The checkBox Unchecked\n")
 
-app = wx.App(False)
-frame = myFrame(None, "Sample Editor")
-app.MainLoop()
+if __name__=='__main__':
+    app = wx.App(False)
+    frame = myFrame(None, "Sample Editor")
+    app.MainLoop()
 

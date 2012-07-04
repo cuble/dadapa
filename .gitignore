@@ -8,4 +8,6 @@ sprint.py
 .metadata
 .project
 .pydevproject
+dist
+build
 

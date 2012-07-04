@@ -1,4 +1,19 @@
 1. the event will stop after the callback finishes. However, you can "skip" an event with event.Skip() to make it go through the hierarchy of event handlers.	
 
-2. 
+2. study it by demo 
+
+3. use GUI2EXE to transfer the py program to exe on Windows
+    download vc2008 redist file from http://www.microsoft.com/en-us/download/details.aspx?id=29, install it
+      copy the manifest file amd64_microsoft.vc90.crt.xx9.0.21022.8yy.manifest in C:\Windows\winsxs\Manifests to C:\Python27\DLLs
+      copy the msvcp90, msvcr90, msvcm90 DLLs in C:\Windows\winsxs\amd64_microsoft.vc90.crt.xx9.0.21022.8yy to C:\Python27\DLLs
+	get suitable version of py2exe installation package from py2exe.org, install it.
+	get GUI2EXE from: http://code.google.com/p/gui2exe/
+	Run GUI2Exe.py directly
+		select the start point .py file 
+		set both Optimize and Compressed to 2, set Bundle Files to 3
+		add the manifest file in C:\Python27\DLLs into "Other Resources" at bottom right
+		click "Compile" at bottom right
+	The EXE will be generated in the dist folder in your startup point .py file located folder
+	    If GUI2Exe didn't copy the manifest file and the microsoft DLLs into the dist folder, do it yourself
+	    If GUI2Exe didn't copy the icon file into the dist, do it yourself
 
