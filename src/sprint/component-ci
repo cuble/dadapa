@@ -1,5 +1,5 @@
 #! /bin/bash
 
-./testSprint.py
+./runTest.py
 cp sprint.py ../../
 
