@@ -6,25 +6,41 @@ import wx
 
 import unittest
 
-myWx = wx
+class myWx:
+    def App(self):
+        return wx.App()
 
-def set_wx(my=wx):
-    global myWx
-    myWx = my
-
-def sut_call_wxapp():
+def sut_call_wxapp(myWx):
     app=myWx.App()
     return app
 
 class moxTest(unittest.TestCase):
-    def test_sut(self):
-        myMox=mox.Mox()
-        wxMox = myMox.CreateMock(wx) 
-        wxMox.App().AndReturn("App Called")
-        myMox.ReplayAll()
-        set_wx(wxMox)
-        self.assertEqual("App Called", sut_call_wxapp())
-        myMox.VerifyAll()
+    def setUp(self):
+        self.mox=mox.Mox()
+    def tearDown(self):
+        self.mox.UnsetStubs()
+        self.mox.VerifyAll()
+
+    def test_mock_basic(self):
+        self.wxMox = self.mox.CreateMock(myWx)
+        self.wxMox.App().AndReturn("App Called Basic")
+        self.mox.ReplayAll()
+        self.assertEqual("App Called Basic", sut_call_wxapp(self.wxMox))
+
+    def test_stub_out(self):
+        testWx = myWx()
+        self.mox.StubOutWithMock(testWx, "App")
+        testWx.App().AndReturn("App Called By Stub")
+        self.mox.ReplayAll()
+        self.assertEqual("App Called By Stub", sut_call_wxapp(testWx)) 
+
+    def test_mock_anything(self):
+        testWx = myWx()
+        mock_app=self.mox.CreateMockAnything()
+        testWx.App = mock_app
+        mock_app().AndReturn("App Called By Mock Anything")
+        self.mox.ReplayAll()
+        self.assertEqual("App Called By Mock Anything", sut_call_wxapp(testWx))
 
 def main():
     unittest.main()
