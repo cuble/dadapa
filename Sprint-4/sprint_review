@@ -1,13 +1,15 @@
 Achievements:
 1. wxPython and GUI programming study
-  - Learn GUI programming with wxpython
+  - Learn GUI programming with wxpython(wxpython: made a example wxpython program and recorded tips about coding and how to make a windows EXE file)
     - Learn GUI basic widgets: app, frame, textCtrl, menue, button, dialog, checkbox, event and so on
     - Learn to transfer program to exe in windows by GUI2exe
 
-1. study python mock framework
-1. solve the UT case discovery problem
+1. study python mock framework: (mock: studied mox)
+1. solve the UT case discovery problem (../src/sprint/runTest.py: search and run all tests in the folder)
     
 Not Done Items:
+Determine the program architecture of the backlog-editor viewer
+Determine the GUI style of the backlog-editor viewer
 1. unittest with stub framework
   - Provide automatical stub install and uninstall interface by a derived class from unittest
   - A tool to generated stub code for a class automatically
