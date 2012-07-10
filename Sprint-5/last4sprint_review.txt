@@ -1,0 +1,14 @@
+Achievement:
+1. studied git usage
+2. created cci environment for self-work environment with git
+3. learnt TDD with python by a small tool to create sprint folder automatically
+4. learnt wxPython basic and learnt create executable on windows from wxPython program
+
+Latest Plan:
+1. UT tools to help python TDD programming
+2. small tool backlog-editor
+3. python cross work with C/C++
+4. python deep
+5. program release issues. 
+
+
