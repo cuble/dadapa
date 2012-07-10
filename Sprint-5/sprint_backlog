@@ -1,0 +1,17 @@
+Period: 2012-7-11 ~ 2012-7-25
+
+Committed Items:
+review the achievement of the previous 4 sprints
+backlog-editor first version
+  - Determine the program architecture of the backlog-editor viewer
+  - Determine the GUI style of the backlog-editor viewer
+  - complete the priority 1 task in the mind map
+1. unittest with stub framework
+  - Provide automatical stub install and uninstall interface by a derived class from unittest
+  - A tool to generated stub code for a class automatically
+
+Not Committed Items:
+x. Study on software distribute and upgrade framework
+y. study the GPL licenses and other open source and none open source licenses
+x. study test coverage problem in python
+
