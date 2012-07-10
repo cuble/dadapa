@@ -8,13 +8,12 @@ Committed Items:
   - Determine the program architecture of the backlog-editor viewer
   - Determine the GUI style of the backlog-editor viewer
 1. unittest with stub framework
-  - solve the UT case discovery problem
   - Provide automatical stub install and uninstall interface by a derived class from unittest
   - A tool to generated stub code for a class automatically
 1. study python mock framework
 
 Not Committed Items:
-2. study py2exe or make install package with wxPython app 
+1. solve the UT case discovery problem
 2. backlog-editor viewer
 x. Study on software distribute and upgrade framework
 x. study test coverage problem in python

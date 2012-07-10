@@ -1,4 +1,16 @@
 Achievements:
+1. wxPython and GUI programming study
+  - Learn GUI programming with wxpython
+    - Learn GUI basic widgets: app, frame, textCtrl, menue, button, dialog, checkbox, event and so on
+    - Learn to transfer program to exe in windows by GUI2exe
 
+1. study python mock framework
+1. solve the UT case discovery problem
+    
 Not Done Items:
-
+1. unittest with stub framework
+  - Provide automatical stub install and uninstall interface by a derived class from unittest
+  - A tool to generated stub code for a class automatically
+2. backlog-editor viewer
+x. Study on software distribute and upgrade framework
+x. study test coverage problem in python
