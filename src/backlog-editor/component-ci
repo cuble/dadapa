@@ -2,6 +2,7 @@
 #This is a script designed to do component continous integration
 
 # Check if files in src/ changed
-git show HEAD|grep src/|grep diff
+#**Need to be implemented
 
+./runTest.py
 

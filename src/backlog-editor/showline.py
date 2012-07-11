@@ -11,6 +11,7 @@ def showline(f):
         pass
     print line
 
-f=open("python_study_Backlog.txt")
-showline(f)
+if __name__ == '__main__':
+    f=open("backlog_editor_Backlog.txt")
+    showline(f)
 

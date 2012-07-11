@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 class item:
-    def __init__(self, parent=none):
+    def __init__(self, parent=None):
         self.subitems = []
         self.content = ""
         self.done_time = "0"
@@ -24,5 +24,5 @@ class item:
 
     def show_item(self):
         pass
-}
+
 
