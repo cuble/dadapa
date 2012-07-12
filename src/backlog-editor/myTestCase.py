@@ -30,27 +30,47 @@ class printPlugin:
         sys.stdout = StringIO()
 
 class UnexpectedCallError:
-    pass
+    def __reper__(self):
+        print "haha"
+
 
 def mock_func(*param):
+    mockPlugin.isMocked = False
     assert_equal(1, len(param))
     assert_equal('123', param[0]) 
     return []
 
+class mockInfo:
+    def __init__(self, org, new, param, expectRet):
+        self.org = org
+        self.new = new
+        self.param = param
+        self.expectRet = expectRet
+
 class mockPlugin:
+    isMocked = False
+    mockRecord = []
     def setUp(self):
-        self.mocked = False
+        pass
 
     def tearDown(self):
-        if self.mocked: 
+        if mockPlugin.mockRecord: 
+            mockPlugin.isMocked = False
+            mockPlugin.mockRecord = []
             raise UnexpectedCallError()
     
     def mock_function(self, function, param, expectedReturn):
-        __builtins__.dir = mock_func
-        self.mocked = True
+        print function.__name__
+        getattr(__name__, function.__name__)
+        function = mock_func
+        mockPlugin.mockRecord.append(mockInfo(function, mock_func, param, expectedReturn)) 
+        mockPlugin.isMocked = True
 #-----------Test Case Part-------------------
 class testSut:
     pass
+
+def myfun(param):
+    return 123
 
 class myTestCaseTest(unittest.TestCase):
     def setUp(self):
@@ -116,19 +136,25 @@ class printPluginTest(unittest.TestCase):
 
 class mockPluginTest(unittest.TestCase):
     def setUp(self):
-        self.mock=mockPlugin()
+        self.mock = mockPlugin()
         self.mock.setUp()
+        print self.mock.isMocked
         
     def test_success_if_no_operation(self):
         self.mock.tearDown()
-    @unittest.skip('undone')        
+       
     def test_fail_if_not_call_mocked_function(self):
         self.mock.mock_function(dir, '123',[])
         self.assertRaises(UnexpectedCallError, self.mock.tearDown)
-    @unittest.skip('undone') 
+
     def test_success_if_mocked_function_called(self):
         self.mock.mock_function(dir,'123',[])
         self.assertEqual([], dir('123'))
+        self.mock.tearDown()
+        
+    def test_sucess_mock_another_function(self):
+        self.mock.mock_function(myfun, 1, 456)
+        self.assertEqual(456, myfun(1))
         self.mock.tearDown()
 
 if __name__=='__main__':
