@@ -33,6 +33,8 @@ class UnexpectedCallError:
     pass
 
 def mock_func(*param):
+    assert_equal(1, len(param))
+    assert_equal('123', param[0]) 
     return []
 
 class mockPlugin:
@@ -44,7 +46,7 @@ class mockPlugin:
             raise UnexpectedCallError()
     
     def mock_function(self, function, param, expectedReturn):
-        dir = mock_func
+        __builtins__.dir = mock_func
         self.mocked = True
 #-----------Test Case Part-------------------
 class testSut:
@@ -119,12 +121,11 @@ class mockPluginTest(unittest.TestCase):
         
     def test_success_if_no_operation(self):
         self.mock.tearDown()
-        
+    @unittest.skip('undone')        
     def test_fail_if_not_call_mocked_function(self):
         self.mock.mock_function(dir, '123',[])
         self.assertRaises(UnexpectedCallError, self.mock.tearDown)
-    
-    @unittest.skip('not complete')
+    @unittest.skip('undone') 
     def test_success_if_mocked_function_called(self):
         self.mock.mock_function(dir,'123',[])
         self.assertEqual([], dir('123'))
