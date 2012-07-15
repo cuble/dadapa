@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
 import unittest
-import mox
 import sys
 from cStringIO import StringIO
+
+
 
 class myTestCase(unittest.TestCase):
     def setUp(self):
@@ -29,58 +30,10 @@ class printPlugin:
         assert_equal(expectedString, sys.stdout.getvalue())
         sys.stdout = StringIO()
 
-class UnexpectedCallError:
-    def __reper__(self):
-        print "haha"
 
-
-def mock_func(*param):
-    mockPlugin.isMocked = False
-    assert_equal(1, len(param))
-    assert_equal('123', param[0]) 
-    return []
-
-class mockInfo:
-    def __init__(self, org, new, param, expectRet):
-        self.org = org
-        self.new = new
-        self.param = param
-        self.expectRet = expectRet
-
-class mockPlugin:
-    isMocked = False
-    mockRecord = []
-    def setUp(self):
-        mockPlugin.isMocked = False
-        self.org_func = None
-        self.mocked_func = None
-        pass
-
-    def tearDown(self):
-        self.mocked_func = self.org_func
-        if mockPlugin.isMocked: 
-            mockPlugin.isMocked = False
-            mockPlugin.mockRecord = []
-            raise UnexpectedCallError()
-    
-    def mock_function(self, func, param, expectedReturn):
-        self.org_func = func
-        if func.__name__ in dir(__builtins__):
-            org_name = func.__name__
-            self.org_func = getattr(__builtins__, org_name)
-            setattr(__builtins__, org_name, mock_func)
-            self.mocked_func = getattr(__builtins__, org_name)
-        else:
-            self.mocked_func = func
-
-        mockPlugin.mockRecord.append(mockInfo(func, mock_func, param, expectedReturn)) 
-        mockPlugin.isMocked = True
 #-----------Test Case Part-------------------
 class testSut:
     pass
-
-def myfun(param):
-    return 123
 
 class myTestCaseTest(unittest.TestCase):
     def setUp(self):
@@ -144,30 +97,6 @@ class printPluginTest(unittest.TestCase):
         self.assertRaises(AssertionError, self.plugin.tearDown) 
         self.assertEqual(sys.stdout, self.plugin.org_stdout)
 
-class mockPluginTest(unittest.TestCase):
-    def setUp(self):
-        self.mock = mockPlugin()
-        self.mock.setUp()
-        
-    def test_success_if_no_operation(self):
-        self.mock.tearDown()
-    
-    @unittest.skip('')   
-    def test_fail_if_not_call_mocked_function(self):
-        self.mock.mock_function(dir, '123',[])
-        self.assertRaises(UnexpectedCallError, self.mock.tearDown)
-        __builtins__.dir = self.mock.org_func
-
-    @unittest.skip('')   
-    def test_success_if_mocked_function_called(self):
-        self.mock.mock_function(dir,'123',[])
-        self.assertEqual([], dir('123'))
-        self.mock.tearDown()
-        
-    def test_sucess_mock_another_function(self):
-        self.mock.mock_function(myfun, 1, 456)
-        self.assertEqual(456, myfun(1))
-        self.mock.tearDown()
 
 if __name__=='__main__':
     unittest.main()
