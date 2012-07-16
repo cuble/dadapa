@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
 import sys
-import unittest
 import os
 import types
+
+import unittest
 import exceptions
 import wx
 
@@ -57,10 +58,10 @@ class stubPlugin:
 
 
 class UnexpectedCallError:
-    def __reper__(self):
-        print "haha"
+    def __repr__(self):
+        return "\nhaha"
 
-
+_mockPlugin = None
 def mock_func(*param):
     mockPlugin.isMocked = False
     assert_equal(1, len(param))
@@ -79,6 +80,15 @@ org_func = ''
 mocked_func = ''
 mocked_module = ''
 
+def singleton(cls):
+    instances = {}
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+    return getinstance
+
+@singleton
 class mockPlugin(stubPlugin):
     isMocked = False
     def setUp(self):
@@ -186,6 +196,10 @@ class mockPluginTest(unittest.TestCase):
         self.mock = mockPlugin()
         self.mock.setUp()
         
+    def test_mock_is_a_singerton(self):
+        mock=mockPlugin()
+        self.assertEqual(mock, self.mock)
+        
     def test_success_if_no_operation(self):
         self.mock.tearDown()
     
@@ -209,7 +223,9 @@ class mockPluginTest(unittest.TestCase):
 
     def test_fail_if_not_call_mocked_buitin_function(self):
         self.mock.mock_function(sorted, '123',100)
-        self.assertRaises(UnexpectedCallError, self.mock.tearDown)
+        with self.assertRaises(UnexpectedCallError) as cm:
+            self.mock.tearDown()
+        self.assertEqual('\nhaha', str(cm.exception))
         self.assertEqual(['1','2','3'], sorted('132'))
 
     def test_success_if_mocked_buitin_function_called(self):
