@@ -9,6 +9,53 @@ import wx
 
 from myTestCase import assert_equal
 
+def get_module_name(func):
+    module_name=func.__module__
+    module_dict = globals()
+    if module_name in ('posix', 'nt') and module_name not in module_dict and 'os' in module_dict:
+        module_name = 'os'
+    return module_name
+
+class stubPlugin:
+    class stub_imp:
+        def __init__(self, do_stub, do_recover):
+            self.do_stub = do_stub
+            self.do_recover = do_recover
+            
+    def __init__(self):
+        self.orgfuncList = []
+        self.stubImpDict = {}
+        self.stubImpDict[types.UnboundMethodType] = stubPlugin.stub_imp(self._stub_out_instancemethod, self._recover_instancemethod)
+        self.stubImpDict[types.FunctionType] = stubPlugin.stub_imp(self._stub_out_general_function, self._recover_general_function)
+        self.stubImpDict[types.BuiltinFunctionType] = stubPlugin.stub_imp(self._stub_out_general_function, self._recover_general_function)
+        
+    def _stub_out_instancemethod(self, orgfunc, stubfunc):
+        setattr(orgfunc.im_class, orgfunc.__name__, stubfunc)
+        
+    def _recover_instancemethod(self, orgfunc):
+        setattr(orgfunc.im_class, orgfunc.__name__, orgfunc)
+        
+    def _stub_out_general_function(self, orgfunc, stubfunc):
+        orgModule = get_module_name(orgfunc)
+        sys.modules[orgModule].__dict__[orgfunc.__name__] = stubfunc
+        
+    def _recover_general_function(self, orgfunc):
+        orgModule = get_module_name(orgfunc)
+        sys.modules[orgModule].__dict__[orgfunc.__name__] = orgfunc
+        
+    def stub_out(self, orgfunc, stubfunc):
+        self.orgfuncList.append(orgfunc)
+        funcType = type(orgfunc)
+        if funcType in self.stubImpDict:
+            self.stubImpDict[funcType].do_stub(orgfunc, stubfunc)
+        else:
+            raise TypeError("can't stub function type: {0}".format(str(funcType)))
+        
+    def teardown(self):
+        for orgfunc in self.orgfuncList:
+            self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
+
+
 class UnexpectedCallError:
     def __reper__(self):
         print "haha"
@@ -31,15 +78,8 @@ class mockInfo:
 org_func = ''
 mocked_func = ''
 mocked_module = ''
-def get_module_name(func):
-    module_name=func.__module__
-    module_dict = globals()
-    if module_name in ('posix', 'nt') and module_name not in module_dict and 'os' in module_dict:
-        module_name = 'os'
-    return module_name
 
-
-class mockPlugin:
+class mockPlugin(stubPlugin):
     isMocked = False
     def setUp(self):
         mockPlugin.isMocked = False
@@ -60,44 +100,6 @@ class mockPlugin:
         setattr(mocked_module, func.__name__, mock_func)
         mockPlugin.isMocked = True
 
-class stubPlugin:
-    class stub_imp:
-        def __init__(self, do_stub, do_recover):
-            self.do_stub = do_stub
-            self.do_recover = do_recover
-            
-    def __init__(self):
-        self.orgfuncList = []
-        self.stubImpDict = {}
-        self.stubImpDict[types.UnboundMethodType] = stubPlugin.stub_imp(self.stub_out_instancemethod, self.recover_instancemethod)
-        self.stubImpDict[types.FunctionType] = stubPlugin.stub_imp(self.stub_out_general_function, self.recover_general_function)
-        self.stubImpDict[types.BuiltinFunctionType] = stubPlugin.stub_imp(self.stub_out_general_function, self.recover_general_function)
-        
-    def stub_out_instancemethod(self, orgfunc, stubfunc):
-        setattr(orgfunc.im_class, orgfunc.__name__, stubfunc)
-        
-    def recover_instancemethod(self, orgfunc):
-        setattr(orgfunc.im_class, orgfunc.__name__, orgfunc)
-        
-    def stub_out_general_function(self, orgfunc, stubfunc):
-        orgModule = get_module_name(orgfunc)
-        sys.modules[orgModule].__dict__[orgfunc.__name__] = stubfunc
-        
-    def recover_general_function(self, orgfunc):
-        orgModule = get_module_name(orgfunc)
-        sys.modules[orgModule].__dict__[orgfunc.__name__] = orgfunc
-        
-    def stub_out(self, orgfunc, stubfunc):
-        self.orgfuncList.append(orgfunc)
-        funcType = type(orgfunc)
-        if funcType in self.stubImpDict:
-            self.stubImpDict[funcType].do_stub(orgfunc, stubfunc)
-        else:
-            raise TypeError("can't stub function type: {0}".format(str(funcType)))
-        
-    def teardown(self):
-        for orgfunc in self.orgfuncList:
-            self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
 
 #------------------Test Part--------------
 def myfun(param):
@@ -106,43 +108,6 @@ def myfun(param):
 class myclass:
     def fun(self, param):
         return param
-        
-class mockPluginTest(unittest.TestCase):
-    def setUp(self):
-        self.mock = mockPlugin()
-        self.mock.setUp()
-        
-    def test_success_if_no_operation(self):
-        self.mock.tearDown()
-    
-    def test_sucess_mock_function(self):
-        self.mock.mock_function(myfun, '123', 10)
-        self.assertEqual(10, myfun('123'))
-        self.mock.tearDown()
-        self.assertEqual('myfun', myfun.__name__)
-        
-    def test_success_mock_sys_function(self):
-        self.mock.mock_function(sys.callstats, '123', 10)
-        self.assertEqual(10, sys.callstats('123'))
-        self.mock.tearDown()
-        self.assertEqual("callstats", sys.callstats.__name__)
-
-    def test_success_mock_os_function(self):
-        self.mock.mock_function(os.listdir, '123', 10)
-        self.assertEqual(10, os.listdir('123'))
-        self.mock.tearDown()
-        self.assertEqual('listdir', os.listdir.__name__)
-
-    def test_fail_if_not_call_mocked_buitin_function(self):
-        self.mock.mock_function(sorted, '123',100)
-        self.assertRaises(UnexpectedCallError, self.mock.tearDown)
-        self.assertEqual(['1','2','3'], sorted('132'))
-
-    def test_success_if_mocked_buitin_function_called(self):
-        self.mock.mock_function(sorted,'123',10)
-        self.assertEqual(10, sorted('123'))
-        self.mock.tearDown()
-        self.assertEqual(['1','2','3'], sorted('132'))
         
 def stubfun():
     return 456
@@ -214,6 +179,44 @@ class stubPluginTest(unittest.TestCase):
         self.assertEqual('myfun', myfun.__name__)
         self.assertEqual('fun', mc.fun.__name__)
         self.assertEqual('__init__', wx.App.__init__.__name__)
+
+        
+class mockPluginTest(unittest.TestCase):
+    def setUp(self):
+        self.mock = mockPlugin()
+        self.mock.setUp()
+        
+    def test_success_if_no_operation(self):
+        self.mock.tearDown()
+    
+    def test_sucess_mock_function(self):
+        self.mock.mock_function(myfun, '123', 10)
+        self.assertEqual(10, myfun('123'))
+        self.mock.tearDown()
+        self.assertEqual('myfun', myfun.__name__)
+        
+    def test_success_mock_sys_function(self):
+        self.mock.mock_function(sys.callstats, '123', 10)
+        self.assertEqual(10, sys.callstats('123'))
+        self.mock.tearDown()
+        self.assertEqual("callstats", sys.callstats.__name__)
+
+    def test_success_mock_os_function(self):
+        self.mock.mock_function(os.listdir, '123', 10)
+        self.assertEqual(10, os.listdir('123'))
+        self.mock.tearDown()
+        self.assertEqual('listdir', os.listdir.__name__)
+
+    def test_fail_if_not_call_mocked_buitin_function(self):
+        self.mock.mock_function(sorted, '123',100)
+        self.assertRaises(UnexpectedCallError, self.mock.tearDown)
+        self.assertEqual(['1','2','3'], sorted('132'))
+
+    def test_success_if_mocked_buitin_function_called(self):
+        self.mock.mock_function(sorted,'123',10)
+        self.assertEqual(10, sorted('123'))
+        self.mock.tearDown()
+        self.assertEqual(['1','2','3'], sorted('132'))
 
 if __name__=='__main__':
     unittest.main()
