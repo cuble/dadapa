@@ -3,6 +3,9 @@
 import sys
 import unittest
 import os
+import types
+import exceptions
+import wx
 
 from myTestCase import assert_equal
 
@@ -30,9 +33,11 @@ mocked_func = ''
 mocked_module = ''
 def get_module_name(func):
     module_name=func.__module__
-    if module_name == 'posix' and 'posix' not in globals() and 'os' in globals():
+    module_dict = globals()
+    if module_name in ('posix', 'nt') and module_name not in module_dict and 'os' in module_dict:
         module_name = 'os'
     return module_name
+
 
 class mockPlugin:
     isMocked = False
@@ -50,32 +55,57 @@ class mockPlugin:
         mocked_func = func.__name__
         module_name = get_module_name(func)
         mocked_module = sys.modules[module_name]
-        #print mocked_module, mocked_func
+#        print mocked_module, mocked_func
         org_func = getattr(mocked_module, func.__name__)
         setattr(mocked_module, func.__name__, mock_func)
         mockPlugin.isMocked = True
 
-def stubfun():
-    return 456
-
 class stubPlugin:
+    class stub_imp:
+        def __init__(self, do_stub, do_recover):
+            self.do_stub = do_stub
+            self.do_recover = do_recover
+            
     def __init__(self):
-        self.orgfun = None
-        self.orgModule = None
-
-    def stubOut(self, orgfunc, stubfunc):
-        self.orgfun = orgfunc
-        self.orgModule = get_module_name(orgfunc)
-        module = sys.modules[self.orgModule]
-        setattr(module, orgfunc.__name__, stubfunc)
+        self.orgfuncList = []
+        self.stubImpDict = {}
+        self.stubImpDict[types.UnboundMethodType] = stubPlugin.stub_imp(self.stub_out_instancemethod, self.recover_instancemethod)
+        self.stubImpDict[types.FunctionType] = stubPlugin.stub_imp(self.stub_out_general_function, self.recover_general_function)
+        self.stubImpDict[types.BuiltinFunctionType] = stubPlugin.stub_imp(self.stub_out_general_function, self.recover_general_function)
+        
+    def stub_out_instancemethod(self, orgfunc, stubfunc):
+        setattr(orgfunc.im_class, orgfunc.__name__, stubfunc)
+        
+    def recover_instancemethod(self, orgfunc):
+        setattr(orgfunc.im_class, orgfunc.__name__, orgfunc)
+        
+    def stub_out_general_function(self, orgfunc, stubfunc):
+        orgModule = get_module_name(orgfunc)
+        sys.modules[orgModule].__dict__[orgfunc.__name__] = stubfunc
+        
+    def recover_general_function(self, orgfunc):
+        orgModule = get_module_name(orgfunc)
+        sys.modules[orgModule].__dict__[orgfunc.__name__] = orgfunc
+        
+    def stub_out(self, orgfunc, stubfunc):
+        self.orgfuncList.append(orgfunc)
+        funcType = type(orgfunc)
+        if funcType in self.stubImpDict:
+            self.stubImpDict[funcType].do_stub(orgfunc, stubfunc)
+        else:
+            raise TypeError("can't stub function type: {0}".format(str(funcType)))
         
     def teardown(self):
-        module = sys.modules[self.orgModule]
-        setattr(module, self.orgfun.__name__, self.orgfun)
+        for orgfunc in self.orgfuncList:
+            self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
 
 #------------------Test Part--------------
 def myfun(param):
     return 123
+
+class myclass:
+    def fun(self, param):
+        return param
         
 class mockPluginTest(unittest.TestCase):
     def setUp(self):
@@ -114,27 +144,76 @@ class mockPluginTest(unittest.TestCase):
         self.mock.tearDown()
         self.assertEqual(['1','2','3'], sorted('132'))
         
+def stubfun():
+    return 456
+
+def stubfun_with_one_param(p1):
+    return 456
+
+def stub_init_fun(self):
+    '''stub init fun, return None'''
+    self.param = 456
+
 class stubPluginTest(unittest.TestCase):
     def setUp(self):
         self.stub = stubPlugin()        
     
-    def test_stub_myfun_success(self):
-        self.stub.stubOut(myfun, stubfun)
-        self.assertEqual(456, myfun())
+    def _stub_a_func_success_test(self, target):
+        self.stub.stub_out(target, stubfun)
+        module=get_module_name(target)
+        self.assertEqual(456, sys.modules[module].__dict__[target.__name__]())
         self.stub.teardown()
-        self.assertEqual(123, myfun(1))
-                
-    def test_stub_sys_func_success(self):
-        self.stub.stubOut(sys.callstats, stubfun)
-        self.assertEqual(456, sys.callstats())
-        self.stub.teardown()
-        self.assertEqual("callstats", sys.callstats.__name__)
+        self.assertEqual(target.__name__, sys.modules[module].__dict__[target.__name__].__name__)
         
-    def test_stub_os_func_success(self):
-        self.stub.stubOut(os.listdir, stubfun)
-        self.assertEqual(456, os.listdir())
+    def test_stub_myfun(self):
+        self._stub_a_func_success_test(myfun)
+                
+    def test_stub_sys_func(self):
+        self._stub_a_func_success_test(sys.callstats)
+        
+    def test_stub_os_func(self):
+        self._stub_a_func_success_test(os.listdir)
+        
+    def test_stub_class_func(self):
+        self.stub.stub_out(myclass.fun, stubfun_with_one_param)
+        mc=myclass()
+        self.assertEqual(456, mc.fun())
         self.stub.teardown()
-        self.assertEqual('listdir', os.listdir.__name__)
+        self.assertEqual('fun', mc.fun.__name__)
+        
+    def test_stub_instance_func_is_the_same_as_stub_class_func(self):
+        mc=myclass()
+        mc1=myclass()
+        self.stub.stub_out(mc.fun, stubfun_with_one_param)
+        self.assertEqual(456, mc1.fun())
+        self.stub.teardown()
+        self.assertEqual('fun', mc1.fun.__name__)
+
+    def test_stub_wx_app_func(self):
+        self.stub.stub_out(wx.App.__init__, stub_init_fun)
+        ma = wx.App()
+        self.assertEqual(456, ma.param)
+        self.stub.teardown()
+        self.assertEqual('__init__', wx.App.__init__.__name__)
+        
+    def test_stub_unsupported_func_type_failed(self):
+        with self.assertRaises(TypeError) as ec:
+            self.stub.stub_out(exceptions.Exception.__repr__, stubfun_with_one_param)
+        self.assertEqual("can't stub function type: <type 'wrapper_descriptor'>", ec.exception.message)
+
+    def test_stub_three_func(self):
+        self.stub.stub_out(myclass.fun, stubfun_with_one_param)
+        self.stub.stub_out(myfun, stubfun)
+        self.stub.stub_out(wx.App.__init__, stub_init_fun)
+        mc = myclass()
+        ma = wx.App()
+        self.assertEqual(456, myfun())
+        self.assertEqual(456, mc.fun())
+        self.assertEqual(456, ma.param)
+        self.stub.teardown()
+        self.assertEqual('myfun', myfun.__name__)
+        self.assertEqual('fun', mc.fun.__name__)
+        self.assertEqual('__init__', wx.App.__init__.__name__)
 
 if __name__=='__main__':
     unittest.main()
