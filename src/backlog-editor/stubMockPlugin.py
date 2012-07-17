@@ -1,12 +1,8 @@
 #! /usr/bin/env python
 
 import sys
-import os
 import types
-
-import unittest
-import exceptions
-import wx
+import functools
 
 from myTestCase import assert_equal
 
@@ -22,7 +18,7 @@ class stubPlugin:
         def __init__(self, do_stub, do_recover):
             self.do_stub = do_stub
             self.do_recover = do_recover
-            
+
     def __init__(self):
         self.orgfuncList = []
         self.stubImpDict = {}
@@ -61,13 +57,6 @@ class UnexpectedCallError:
     def __repr__(self):
         return "\nhaha"
 
-_mockPlugin = None
-def mock_func(*param):
-    mockPlugin.isMocked = False
-    assert_equal(1, len(param))
-    assert_equal('123', param[0]) 
-    setattr(mocked_module, mocked_func, org_func)
-    return 10
 
 class mockInfo:
     def __init__(self, org, new, param, expectRet):
@@ -101,6 +90,14 @@ class mockPlugin(stubPlugin):
             raise UnexpectedCallError()
     
     def mock_function(self, func, param, expectedReturn):
+        @functools.wraps(func)
+        def mock_func(*param):
+            mockPlugin.isMocked = False
+            assert_equal(1, len(param))
+            assert_equal('123', param[0]) 
+            setattr(mocked_module, mocked_func, org_func)
+            return 10
+
         global mocked_func, mocked_module, org_func
         mocked_func = func.__name__
         module_name = get_module_name(func)
@@ -112,6 +109,9 @@ class mockPlugin(stubPlugin):
 
 
 #------------------Test Part--------------
+import unittest
+import os
+
 def myfun(param):
     return 123
 
@@ -128,6 +128,16 @@ def stubfun_with_one_param(p1):
 def stub_init_fun(self):
     '''stub init fun, return None'''
     self.param = 456
+
+_wxNotImported = True
+try:
+    import wx
+    _wxNotImported = False
+except ImportError:
+    print "Warning: wxPython not installed, some test cases related will not included"
+
+def ignoreIfwxPythonNotInstalled():
+    return unittest.skipIf(_wxNotImported, 'import wx failed, execute the case will cause exception')
 
 class stubPluginTest(unittest.TestCase):
     def setUp(self):
@@ -164,6 +174,7 @@ class stubPluginTest(unittest.TestCase):
         self.stub.teardown()
         self.assertEqual('fun', mc1.fun.__name__)
 
+    @ignoreIfwxPythonNotInstalled()
     def test_stub_wx_app_func(self):
         self.stub.stub_out(wx.App.__init__, stub_init_fun)
         ma = wx.App()
@@ -173,9 +184,10 @@ class stubPluginTest(unittest.TestCase):
         
     def test_stub_unsupported_func_type_failed(self):
         with self.assertRaises(TypeError) as ec:
-            self.stub.stub_out(exceptions.Exception.__repr__, stubfun_with_one_param)
-        self.assertEqual("can't stub function type: <type 'wrapper_descriptor'>", ec.exception.message)
+            self.stub.stub_out(sorted.__repr__, stubfun_with_one_param)
+        self.assertEqual("can't stub function type: <type 'method-wrapper'>", ec.exception.message)
 
+    @ignoreIfwxPythonNotInstalled()
     def test_stub_three_func(self):
         self.stub.stub_out(myclass.fun, stubfun_with_one_param)
         self.stub.stub_out(myfun, stubfun)
@@ -201,28 +213,33 @@ class mockPluginTest(unittest.TestCase):
         self.assertEqual(mock, self.mock)
         
     def test_success_if_no_operation(self):
-        self.mock.tearDown()
+        self.assertRaises(None, self.mock.tearDown())
     
     def test_sucess_mock_function(self):
         self.mock.mock_function(myfun, '123', 10)
+        self.assertEqual('myfun', myfun.__name__)
         self.assertEqual(10, myfun('123'))
         self.mock.tearDown()
-        self.assertEqual('myfun', myfun.__name__)
+        self.assertEqual(123, myfun(1))
         
     def test_success_mock_sys_function(self):
         self.mock.mock_function(sys.callstats, '123', 10)
+        self.assertEqual('callstats', sys.callstats.__name__)
         self.assertEqual(10, sys.callstats('123'))
         self.mock.tearDown()
-        self.assertEqual("callstats", sys.callstats.__name__)
+        self.assertEqual(None, sys.callstats())
 
     def test_success_mock_os_function(self):
+        orgfun = os.listdir
         self.mock.mock_function(os.listdir, '123', 10)
+        self.assertEqual('listdir', os.listdir.__name__)
         self.assertEqual(10, os.listdir('123'))
         self.mock.tearDown()
-        self.assertEqual('listdir', os.listdir.__name__)
+        self.assertEqual(orgfun, os.listdir)
 
     def test_fail_if_not_call_mocked_buitin_function(self):
         self.mock.mock_function(sorted, '123',100)
+        self.assertEqual('sorted', sorted.__name__)
         with self.assertRaises(UnexpectedCallError) as cm:
             self.mock.tearDown()
         self.assertEqual('\nhaha', str(cm.exception))
@@ -230,6 +247,7 @@ class mockPluginTest(unittest.TestCase):
 
     def test_success_if_mocked_buitin_function_called(self):
         self.mock.mock_function(sorted,'123',10)
+        self.assertEqual('sorted', sorted.__name__)
         self.assertEqual(10, sorted('123'))
         self.mock.tearDown()
         self.assertEqual(['1','2','3'], sorted('132'))
