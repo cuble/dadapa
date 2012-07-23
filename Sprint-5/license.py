@@ -19,7 +19,7 @@ license_txt='''
 
 import os
 
-def license_a_file(f,  result=[]):
+def license_a_file(f,  result):
     tmpfileName=f.name+'.tmp'
     tmpfile=open(tmpfileName, 'w')
     f.seek(0)
@@ -32,9 +32,9 @@ def license_a_file(f,  result=[]):
         if line.rfind('Copyright 2012 Chen Gang(fouryusteel@gmail.com)') != -1: copyrightPresent=True
     if not copyrightPresent:
         lines.insert(1,  license_txt)
-        result.append("{0} add license txt successful".format(f.name))
+        result['Succeed'].append("{0} add license txt successful".format(f.name))
     else:
-        result.append("{0} already contain license info".format(f.name))
+        result['Ignored'].append("{0} already contain license info".format(f.name))
     tmpfile.writelines(lines)
     tmpfile.close()
     f.close()
@@ -43,11 +43,12 @@ def license_a_file(f,  result=[]):
 
 if __name__=='__main__':
     import sys
-    if len(sys.argv) < 2: sys.argv[1] = '*.py'
-    files = os.listdir('.')
-    result = []
+    if len(sys.argv) < 2: sys.argv[1] = '.'
+    if len(sys.argv) < 3: sys.argv[2] = '*.py'
+    files = os.listdir(sys.argv[1])
+    result = {'Succeed':[], 'Ignored':[]}
     for name in files:
-        if name.match(sys.argv[1]):
+        if name.match(sys.argv[2]):
             f = open(name)
             license_a_file(f,  result)
     print result
