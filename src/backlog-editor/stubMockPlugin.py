@@ -142,7 +142,7 @@ def stubfun_with_one_param(p1):
     return 456
 
 def stub_init_fun(self):
-    '''stub init fun, return None'''
+    '''stub init fun, return None is needed'''
     self.param = 456
 
 _wxNotImported = True
