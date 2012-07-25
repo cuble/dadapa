@@ -5,7 +5,7 @@ licensed my code to Apache License, Version 2.0
 
 Not Done Items:
 1. unittest with stub framework
-  - Provide automatical stub install and uninstall interface by a derived class from unittest
+  - Provide automatic stub install and uninstall interface by a derived class from unittest
   - A tool to generated stub code for a class automatically
 x. Study on software distribute and upgrade framework
 backlog-editor first version

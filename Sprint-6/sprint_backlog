@@ -1,0 +1,17 @@
+Period: 2012-7-25 ~ 2012-7-31
+
+Committed Items:
+myTestCase module
+  - stub feature
+  - mock feature
+  - integrate stub and mock into myTestCase interface
+  - install myTestCase into my python
+  - start myTestCase into a new project
+ 
+Not Committed Items:
+backlog-editor first version
+  - Determine the program architecture of the backlog-editor viewer
+  - Determine the GUI style of the backlog-editor viewer
+  - complete the priority 1 task in the mind map
+x. Study on software distribute and upgrade framework
+x. study test coverage problem in python
