@@ -13,7 +13,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+'''stub and mock plugin to support myTestCase
+    * Note: the module can't stub func imported as "from module import func"'''
 
 import sys
 import types
@@ -23,8 +24,7 @@ from myTestCase import assert_equal
 
 def get_module_name(func):
     module_name=func.__module__
-    module_dict = globals()
-    if module_name in ('posix', 'nt') and module_name not in module_dict and 'os' in module_dict:
+    if module_name in ('posix', 'nt'):
         module_name = 'os'
     return module_name
 
@@ -122,150 +122,5 @@ class mockPlugin(stubPlugin):
         setattr(mocked_module, func.__name__, mock_func)
         mockPlugin.isMocked = True
 
-
-#------------------Test Part--------------
-import unittest
-import os
-
-def myfun(param):
-    return 123
-
-class myclass:
-    def fun(self, param):
-        return param
-        
-def stubfun():
-    return 456
-
-def stubfun_with_one_param(p1):
-    return 456
-
-def stub_init_fun(self):
-    '''stub init fun, return None is needed'''
-    self.param = 456
-
-_wxNotImported = True
-try:
-    import wx
-    _wxNotImported = False
-except ImportError:
-    print "Warning: wxPython not installed, some test cases related will not included"
-
-def ignoreIfwxPythonNotInstalled():
-    return unittest.skipIf(_wxNotImported, 'import wx failed, execute the case will cause exception')
-
-class stubPluginTest(unittest.TestCase):
-    def setUp(self):
-        self.stub = stubPlugin()        
-    
-    def _stub_a_func_success_test(self, target):
-        self.stub.stub_out(target, stubfun)
-        module=get_module_name(target)
-        self.assertEqual(456, sys.modules[module].__dict__[target.__name__]())
-        self.stub.teardown()
-        self.assertEqual(target.__name__, sys.modules[module].__dict__[target.__name__].__name__)
-        
-    def test_stub_myfun(self):
-        self._stub_a_func_success_test(myfun)
-                
-    def test_stub_sys_func(self):
-        self._stub_a_func_success_test(sys.callstats)
-        
-    def test_stub_os_func(self):
-        self._stub_a_func_success_test(os.listdir)
-        
-    def test_stub_class_func(self):
-        self.stub.stub_out(myclass.fun, stubfun_with_one_param)
-        mc=myclass()
-        self.assertEqual(456, mc.fun())
-        self.stub.teardown()
-        self.assertEqual('fun', mc.fun.__name__)
-        
-    def test_stub_instance_func_is_the_same_as_stub_class_func(self):
-        mc=myclass()
-        mc1=myclass()
-        self.stub.stub_out(mc.fun, stubfun_with_one_param)
-        self.assertEqual(456, mc1.fun())
-        self.stub.teardown()
-        self.assertEqual('fun', mc1.fun.__name__)
-
-    @ignoreIfwxPythonNotInstalled()
-    def test_stub_wx_app_func(self):
-        self.stub.stub_out(wx.App.__init__, stub_init_fun)
-        ma = wx.App()
-        self.assertEqual(456, ma.param)
-        self.stub.teardown()
-        self.assertEqual('__init__', wx.App.__init__.__name__)
-        
-    def test_stub_unsupported_func_type_failed(self):
-        with self.assertRaises(TypeError) as ec:
-            self.stub.stub_out(sorted.__repr__, stubfun_with_one_param)
-        self.assertEqual("can't stub function type: <type 'method-wrapper'>", ec.exception.message)
-
-    @ignoreIfwxPythonNotInstalled()
-    def test_stub_three_func(self):
-        self.stub.stub_out(myclass.fun, stubfun_with_one_param)
-        self.stub.stub_out(myfun, stubfun)
-        self.stub.stub_out(wx.App.__init__, stub_init_fun)
-        mc = myclass()
-        ma = wx.App()
-        self.assertEqual(456, myfun())
-        self.assertEqual(456, mc.fun())
-        self.assertEqual(456, ma.param)
-        self.stub.teardown()
-        self.assertEqual('myfun', myfun.__name__)
-        self.assertEqual('fun', mc.fun.__name__)
-        self.assertEqual('__init__', wx.App.__init__.__name__)
-
-        
-class mockPluginTest(unittest.TestCase):
-    def setUp(self):
-        self.mock = mockPlugin()
-        self.mock.setUp()
-        
-    def test_mock_is_a_singerton(self):
-        mock=mockPlugin()
-        self.assertEqual(mock, self.mock)
-        
-    def test_success_if_no_operation(self):
-        self.assertRaises(None, self.mock.tearDown())
-    
-    def test_sucess_mock_function(self):
-        self.mock.mock_function(myfun, '123', 10)
-        self.assertEqual('myfun', myfun.__name__)
-        self.assertEqual(10, myfun('123'))
-        self.mock.tearDown()
-        self.assertEqual(123, myfun(1))
-        
-    def test_success_mock_sys_function(self):
-        self.mock.mock_function(sys.callstats, '123', 10)
-        self.assertEqual('callstats', sys.callstats.__name__)
-        self.assertEqual(10, sys.callstats('123'))
-        self.mock.tearDown()
-        self.assertEqual(None, sys.callstats())
-
-    def test_success_mock_os_function(self):
-        orgfun = os.listdir
-        self.mock.mock_function(os.listdir, '123', 10)
-        self.assertEqual('listdir', os.listdir.__name__)
-        self.assertEqual(10, os.listdir('123'))
-        self.mock.tearDown()
-        self.assertEqual(orgfun, os.listdir)
-
-    def test_fail_if_not_call_mocked_buitin_function(self):
-        self.mock.mock_function(sorted, '123',100)
-        self.assertEqual('sorted', sorted.__name__)
-        with self.assertRaises(UnexpectedCallError) as cm:
-            self.mock.tearDown()
-        self.assertEqual('\nhaha', str(cm.exception))
-        self.assertEqual(['1','2','3'], sorted('132'))
-
-    def test_success_if_mocked_buitin_function_called(self):
-        self.mock.mock_function(sorted,'123',10)
-        self.assertEqual('sorted', sorted.__name__)
-        self.assertEqual(10, sorted('123'))
-        self.mock.tearDown()
-        self.assertEqual(['1','2','3'], sorted('132'))
-
 if __name__=='__main__':
-    unittest.main()
+    print __doc__

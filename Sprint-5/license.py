@@ -45,7 +45,7 @@ def license_a_file(f,  result):
 def get_pattern(orgPat):
     newPattern=orgPat.replace('*','[a-z,A-Z,-,_,0-9]*')
     print newPattern
-    return newPattern + '$'
+    return '^' + newPattern + '$'
 
 if __name__=='__main__':
     import sys
