@@ -22,7 +22,7 @@ import re
 
 def license_a_file(f,  result):
     tmpfileName=f.name+'.tmp'
-    tmpfile=open(tmpfileName, 'w')
+    tmpfile=open(tmpfileName, 'wb')
     f.seek(0)
     lines = []
     for l in f:
@@ -58,7 +58,7 @@ if __name__=='__main__':
     os.chdir(sys.argv[1])
     for name in files:
         if re.match(pattern, name):
-            f = open(name)
+            f = open(name, 'rb')
             license_a_file(f,  result)
     print result
 

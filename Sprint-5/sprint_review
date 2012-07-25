@@ -1,4 +1,19 @@
 Achievements:
+review the achievement of the previous 4 sprints
+licensed my code to Apache License, Version 2.0
+
 
 Not Done Items:
+1. unittest with stub framework
+  - Provide automatical stub install and uninstall interface by a derived class from unittest
+  - A tool to generated stub code for a class automatically
+backlog-editor first version
+  - Determine the program architecture of the backlog-editor viewer
+  - Determine the GUI style of the backlog-editor viewer
+  - complete the priority 1 task in the mind map
+x. Study on software distribute and upgrade framework
+x. study test coverage problem in python
 
+
+Additional Information:
+I decide to develop a myTestCase module, which contains stub and mock, to simplify my test cases. Currently stub sub-component is done. mock sub-component is ongoing. And integrate the two part into myTestCase module need to be done later.
