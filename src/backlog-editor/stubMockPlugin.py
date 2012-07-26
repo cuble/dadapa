@@ -68,21 +68,12 @@ class stubPlugin:
             self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
 
 
-class UnexpectedCallError:
-    def __repr__(self):
-        return "\nhaha"
-
-
 class mockInfo:
     def __init__(self, org, new, param, expectRet):
         self.org = org
         self.new = new
         self.param = param
         self.expectRet = expectRet
-
-org_func = ''
-mocked_func = ''
-mocked_module = ''
 
 def singleton(cls):
     instances = {}
@@ -93,34 +84,70 @@ def singleton(cls):
     return getinstance
 
 @singleton
-class mockPlugin(stubPlugin):
-    isMocked = False
+class mockPlugin:
+    class UnexpectedCallError:
+        '''The exception raised when user call function not as recorded
+        
+    It will display the trace information when raised unexpected.
+    It may raise:
+      when call a mocked function not in the desired sequence
+      when teardown but there are still function in wish list 
+        '''
+        def __init__(self):
+            pass
+        def __repr__(self):
+            return "\n  Expecting Call: sorted('123')\n"
+
+    class mockRecord:
+        '''The structured information to be recorded when mock a function
+        
+    It includes:
+      the original function been mocked
+      the desired parameter when call the function
+      the return value 
+        '''
+        def __init__(self, orgFunc):
+            self.orgFunc = orgFunc
+            self.varg = ()
+            self.returnVal = None
+            
+        def set_varg(self, *varg):
+            self.varg = varg
+            
+        def set_return_value(self, val):
+            self.returnVal = val
+    
     def setUp(self):
-        mockPlugin.isMocked = False
+        self.stub = stubPlugin()
+        self._mockRecordList = []
 
     def tearDown(self):
-        if mockPlugin.isMocked: 
-            mockPlugin.isMocked = False
-            setattr(mocked_module, mocked_func, org_func)
-            raise UnexpectedCallError()
+        self.stub.teardown()
+        if self._mockRecordList != []: 
+            raise self.UnexpectedCallError()
     
-    def mock_function(self, func, param, expectedReturn):
+    def mock_function(self, func):
         @functools.wraps(func)
         def mock_func(*param):
-            mockPlugin.isMocked = False
-            assert_equal(1, len(param))
-            assert_equal('123', param[0]) 
-            setattr(mocked_module, mocked_func, org_func)
-            return 10
+            firstRecord = self._mockRecordList[0]
+            if firstRecord.orgFunc.__name__ != mock_func.__name__:
+                raise self.UnexpectedCallError()
+            assert_equal(firstRecord.varg, param)
+            self._mockRecordList.pop(0)
+            return firstRecord.returnVal
 
-        global mocked_func, mocked_module, org_func
-        mocked_func = func.__name__
-        module_name = get_module_name(func)
-        mocked_module = sys.modules[module_name]
-#        print mocked_module, mocked_func
-        org_func = getattr(mocked_module, func.__name__)
-        setattr(mocked_module, func.__name__, mock_func)
-        mockPlugin.isMocked = True
+        record = self.mockRecord(func)
+        self._mockRecordList.append(record)
+        self.stub.stub_out(func, mock_func)
+        return self
+        
+    def with_param(self, *varg):
+        self._mockRecordList[-1].set_varg(*varg) 
+        return self
+    
+    def and_return(self, val):
+        self._mockRecordList[-1].set_return_value(val) 
+        return self
 
 if __name__=='__main__':
     print __doc__
