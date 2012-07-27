@@ -18,11 +18,16 @@ import os
 import sys
 import unittest
 
-from stubMockPlugin import mockPlugin
+from stubMockPlugin import mockPlugin
 
 def myfun():
     return 123
-        
+
+class myClass:
+    def fun(self):
+        return 'real fun in myClass'
+
+    
 class mockPluginTest(unittest.TestCase):
     def setUp(self):
         self.mock = mockPlugin()
@@ -45,14 +50,12 @@ class mockPluginTest(unittest.TestCase):
     
     def test_sucess_mock_myfun(self):
         self.mock.mock_function(myfun).with_param('123', '456')
-        self.assertEqual('myfun', myfun.__name__)
         self.assertEqual(None, myfun('123', '456'))
         self.mock.tearDown()
         self.assertEqual(123, myfun())
         
     def test_success_mock_sys_function(self):
         self.mock.mock_function(sys.callstats).and_return(1)
-        self.assertEqual('callstats', sys.callstats.__name__)
         self.assertEqual(1, sys.callstats())
         self.mock.tearDown()
         self.assertEqual(None, sys.callstats())
@@ -60,75 +63,80 @@ class mockPluginTest(unittest.TestCase):
     def test_success_mock_os_function(self):
         orgfun = os.chdir
         self.mock.mock_function(os.chdir).with_param('.').and_return(True)
-        self.assertEqual('chdir', os.chdir.__name__)
         self.assertEqual(True, os.chdir('.'))
         self.mock.tearDown()
         self.assertEqual(orgfun, os.chdir)
 
-    def test_fail_if_not_call_mocked_buitin_function(self):
-        self.mock.mock_function(sorted).with_param('123').and_return(10)
-        self.assertEqual('sorted', sorted.__name__)
-        with self.assertRaises(self.mock.UnexpectedCallError) as cm:
-            self.mock.tearDown()
-        self.assertEqual("\n  Expecting Call: sorted('123')\n", str(cm.exception))
-        self.assertEqual(['1','2','3'], sorted('132'))
-
     def test_success_mock_buitin_function(self):
         self.mock.mock_function(sorted).with_param('123').and_return(10)
-        self.assertEqual('sorted', sorted.__name__)
         self.assertEqual(10, sorted('123'))
         self.mock.tearDown()
         self.assertEqual(['1','2','3'], sorted('132'))
-        
+
+    def test_mock_with_key_param(self):
+        self.mock.mock_function(myfun).with_param(1,2,3,p1=4,p2=5)
+        self.assertEqual(None, myfun(1,2,3, p1=4, p2=5))
+        self.mock.tearDown()
+                
     def test_success_mock_several_functions(self):
         self.mock.mock_function(myfun).and_return('myfun')
-        self.mock.mock_function(sorted).with_param('AnythingIsOk')
+        self.mock.mock_function(sorted).with_param('AnythingIsOk', p='aKeyParam')
         self.mock.mock_function(os.chdir).with_param('..').and_return('aObject')
         self.assertEqual('myfun', myfun())
-        self.assertEqual(None, sorted('AnythingIsOk'))
+        self.assertEqual(None, sorted('AnythingIsOk', p='aKeyParam'))
         self.assertEqual('aObject', os.chdir('..'))
         self.mock.tearDown()
         self.assertEqual(123, myfun())
         self.assertEqual(['1', '2', '3'], sorted('132'))
         self.assertEqual(None, os.chdir('.'))
+
+    def _check_unexpectedCall_exception_content(self, exception, expect, real):
+        self.assertEqual(expect, exception.expect)
+        self.assertEqual(real, exception.real)
+
+    def test_fail_if_not_call_mocked_function(self):
+        self.mock.mock_function(sorted).with_param('123').and_return(10)
+        self.assertEqual('sorted', sorted.__name__)
+        with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
+            self.mock.tearDown()
+        expect = mockPlugin().mockRecord(sorted, '123')
+        self._check_unexpectedCall_exception_content(cm.exception, expect, None)
+        self.assertEqual(['1','2','3'], sorted('132'))
         
-    def test_failed_if_mocked_function_call_in_wrong_sequence(self):
+    def test_fail_if_mocked_function_call_in_wrong_sequence(self):
         self.mock.mock_function(myfun).and_return('myfun')
         self.mock.mock_function(sorted).with_param('AnythingIsOk')
         with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
-            sorted()
-        self.assertEqual("\n  Expecting Call: sorted('123')\n", str(cm.exception))
-        
-    def test_mock_with_key_param_is_allowed(self):
-        self.mock.mock_function(myfun).with_param(1,2,3,p1=4,p2=5)
-        self.assertEqual(None, myfun(1,2,3, p1=4, p2=5))
-        
-    def test_failed_if_param_not_the_expected(self):
+            sorted()        
+        expect = mockPlugin().mockRecord(myfun)
+        real = mockPlugin().mockRecord(sorted)
+        self._check_unexpectedCall_exception_content(cm.exception, expect, real)
+
+    def test_fail_if_param_not_the_expected(self):
         self.mock.mock_function(myfun).with_param(1,'1','anything')
         with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
             myfun(1,1)
-        expectedString='''
-  expected call: myfun(1, '1', 'anything')
-  but was:       myfun(1, 1)
-        '''
-        self.assertEqual(expectedString,str(cm.exception))
+        expect = mockPlugin().mockRecord(myfun, 1, '1', 'anything')
+        real = mockPlugin().mockRecord(myfun, 1, 1)
+        self._check_unexpectedCall_exception_content(cm.exception, expect, real)
         
-    def test_failed_if_key_param_not_the_same(self):
+    def test_fail_if_key_param_not_the_same(self):
         self.mock.mock_function(myfun).with_param(1,p1=2,p2=3)
         with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
-            myfun(1,1)
-        expectedString='''
-  expected call: myfun(1, p1=2, p2=3)
-  but was:       myfun(1, p1=2)
-        '''
-        self.assertEqual(expectedString,str(cm.exception))
+            myfun(1,p1=2)
+        expect = mockPlugin().mockRecord(myfun, 1, p1=2, p2=3)
+        real = mockPlugin().mockRecord(myfun, 1, p1=2)
+        self._check_unexpectedCall_exception_content(cm.exception, expect, real)
 
-    @unittest.skip('not done')
-    def test_failed_if_call_with_param_twice(self):
+    def test_fail_if_set_param_after_param_already_set(self):
         with self.assertRaises(SyntaxError) as cm:
             self.mock.mock_function(myfun).with_param(1).with_param(2)
+        self.assertEqual('expected param already set', str(cm.exception))
 
-        
+    def test_fail_if_set_param_after_key_param_already_set(self):
+        with self.assertRaises(SyntaxError) as cm:
+            self.mock.mock_function(myfun).with_param(p=1).with_param(2)
+        self.assertEqual('expected param already set', str(cm.exception))
 
 if __name__=='__main__':
     unittest.main()
