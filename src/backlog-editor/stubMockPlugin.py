@@ -56,24 +56,19 @@ class stubPlugin:
         sys.modules[orgModule].__dict__[orgfunc.__name__] = orgfunc
         
     def stub_out(self, orgfunc, stubfunc):
-        self.orgfuncList.append(orgfunc)
         funcType = type(orgfunc)
         if funcType in self.stubImpDict:
             self.stubImpDict[funcType].do_stub(orgfunc, stubfunc)
+            self.orgfuncList.append(orgfunc)
         else:
             raise TypeError("can't stub function type: {0}".format(str(funcType)))
+        
         
     def teardown(self):
         for orgfunc in self.orgfuncList:
             self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
+        self.orgfuncList=[]
 
-
-class mockInfo:
-    def __init__(self, org, new, param, expectRet):
-        self.org = org
-        self.new = new
-        self.param = param
-        self.expectRet = expectRet
 
 def singleton(cls):
     instances = {}
@@ -117,22 +112,26 @@ class mockPlugin:
         def set_return_value(self, val):
             self.returnVal = val
     
-    def setUp(self):
+    def __init__(self):
         self.stub = stubPlugin()
+    
+    def setUp(self):
         self._mockRecordList = []
 
     def tearDown(self):
         self.stub.teardown()
         if self._mockRecordList != []: 
+            self._mockRecordList = []
             raise self.UnexpectedCallError()
     
     def mock_function(self, func):
         @functools.wraps(func)
-        def mock_func(*param):
+        def mock_func(*varg, **karg):
             firstRecord = self._mockRecordList[0]
             if firstRecord.orgFunc.__name__ != mock_func.__name__:
                 raise self.UnexpectedCallError()
-            assert_equal(firstRecord.varg, param)
+            if firstRecord.varg != varg:
+                raise self.UnexpectedCallError()
             self._mockRecordList.pop(0)
             return firstRecord.returnVal
 
@@ -141,7 +140,7 @@ class mockPlugin:
         self.stub.stub_out(func, mock_func)
         return self
         
-    def with_param(self, *varg):
+    def with_param(self, *varg, **karg):
         self._mockRecordList[-1].set_varg(*varg) 
         return self
     

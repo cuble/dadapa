@@ -50,7 +50,10 @@ def ignoreIfwxPythonNotInstalled():
 
 class stubPluginTest(unittest.TestCase):
     def setUp(self):
-        self.stub = stubPlugin()        
+        self.stub = stubPlugin()       
+        
+    def tearDown(self):
+        self.assertEqual([], self.stub.orgfuncList)
     
     def _stub_a_func_success_test(self, target):
         self.stub.stub_out(target, stubfun)

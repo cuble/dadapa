@@ -27,7 +27,13 @@ class mockPluginTest(unittest.TestCase):
     def setUp(self):
         self.mock = mockPlugin()
         self.mock.setUp()
-        self.assertEqual([], self.mock.stub.orgfuncList)
+        
+    def tearDown(self):
+        try:
+            self.mock.tearDown()
+        except mockPlugin().UnexpectedCallError:
+            #accessed private member just for test
+            self.assertEqual([],self.mock._mockRecordList)
 
         
     def test_mock_is_a_singerton(self):
@@ -89,9 +95,39 @@ class mockPluginTest(unittest.TestCase):
     def test_failed_if_mocked_function_call_in_wrong_sequence(self):
         self.mock.mock_function(myfun).and_return('myfun')
         self.mock.mock_function(sorted).with_param('AnythingIsOk')
-        with self.assertRaises(self.mock.UnexpectedCallError) as cm:
+        with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
             sorted()
         self.assertEqual("\n  Expecting Call: sorted('123')\n", str(cm.exception))
+        
+    def test_mock_with_key_param_is_allowed(self):
+        self.mock.mock_function(myfun).with_param(1,2,3,p1=4,p2=5)
+        self.assertEqual(None, myfun(1,2,3, p1=4, p2=5))
+        
+    def test_failed_if_param_not_the_expected(self):
+        self.mock.mock_function(myfun).with_param(1,'1','anything')
+        with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
+            myfun(1,1)
+        expectedString='''
+  expected call: myfun(1, '1', 'anything')
+  but was:       myfun(1, 1)
+        '''
+        self.assertEqual(expectedString,str(cm.exception))
+        
+    def test_failed_if_key_param_not_the_same(self):
+        self.mock.mock_function(myfun).with_param(1,p1=2,p2=3)
+        with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
+            myfun(1,1)
+        expectedString='''
+  expected call: myfun(1, p1=2, p2=3)
+  but was:       myfun(1, p1=2)
+        '''
+        self.assertEqual(expectedString,str(cm.exception))
+
+    @unittest.skip('not done')
+    def test_failed_if_call_with_param_twice(self):
+        with self.assertRaises(SyntaxError) as cm:
+            self.mock.mock_function(myfun).with_param(1).with_param(2)
+
         
 
 if __name__=='__main__':
