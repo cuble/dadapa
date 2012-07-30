@@ -89,20 +89,13 @@ class mockPlugin:
         def __init__(self, expectedCallInfo, realCallInfo=None):
             self.expect = expectedCallInfo
             self.real = realCallInfo
-            
-            
-        def str_expect_param(self):
-            info = "\n    Expecting Call: " + self.expect.orgFunc.__name__
-            kargStr = ""
-            for k in sorted(self.expect.karg.keys()):
-                kargStr = kargStr + ", " + str(k) + "=" +\
-                 repr(self.expect.karg[k]) 
-            argStr="(" +  ", ".join(repr(v) for v in self.expect.varg) + kargStr + ")"
-            return info + argStr + '\n'
 
         def __repr__(self):
-            errorStr = self.str_expect_param()
-            return errorStr
+            info = "\n    Expecting Call: " + repr(self.expect)
+            if self.real: 
+                info += "\n    But Is: " + repr(self.real)
+            info += "\n"
+            return info
 
     class mockRecord:
         '''The structured information to be recorded when mock a function
@@ -138,12 +131,14 @@ class mockPlugin:
             return not self.__eq__(other)
         
         def __repr__(self):
-            info = "\n    Expecting Call: " + self.expect.orgFunc.__name__
+            callStr = self.orgFunc.__name__
             kargStr = ""
-            for k in sorted(self.expect.karg.keys()):
+            for k in sorted(self.karg.keys()):
                 kargStr = kargStr + ", " + str(k) + "=" +\
-                 repr(self.expect.karg[k]) 
-            argStr="(" +  ", ".join(repr(v) for v in self.expect.varg) + kargStr + ")"
+                 repr(self.karg[k]) 
+            callStr += "(" + \
+             ", ".join(repr(v) for v in self.varg) + kargStr + ")"
+            return callStr 
 
     
     def __init__(self):
