@@ -67,6 +67,13 @@ class mockPluginTest(unittest.TestCase):
         self.mock.tearDown()
         self.assertEqual(orgfun, os.chdir)
 
+    def test_success_mock_function_in_myclass(self):
+        self.mock.mock_function(myClass.fun).with_param(1).and_return(2)
+        c=myClass()
+        self.assertEqual(2, c.fun(1))
+        self.mock.tearDown()
+        self.assertEqual('real fun in myClass', c.fun())
+
     def test_success_mock_buitin_function(self):
         self.mock.mock_function(sorted).with_param('123').and_return(10)
         self.assertEqual(10, sorted('123'))
@@ -137,6 +144,78 @@ class mockPluginTest(unittest.TestCase):
         with self.assertRaises(SyntaxError) as cm:
             self.mock.mock_function(myfun).with_param(p=1).with_param(2)
         self.assertEqual('expected param already set', str(cm.exception))
+
+class mockRecordTest(unittest.TestCase):
+    def test_two_record_equal(self):
+        record_1 = mockPlugin().mockRecord(myfun, 1, p1=1)
+        record_2 = mockPlugin().mockRecord(myfun, 1, p1=1)
+        self.assertEqual(record_1, record_2)
+        
+    def test_two_record_not_equal_if_func_name_different(self):
+        record_1 = mockPlugin().mockRecord(myfun)
+        record_2 = mockPlugin().mockRecord(sorted)
+        self.assertNotEqual(record_1, record_2)
+
+    def test_two_record_not_equal_if_param_different(self):
+        record_1 = mockPlugin().mockRecord(myfun)
+        record_2 = mockPlugin().mockRecord(myfun, 1)
+        self.assertNotEqual(record_1, record_2)
+
+    def test_two_record_not_equal_if_key_param_different(self):
+        record_1 = mockPlugin().mockRecord(myfun)
+        record_2 = mockPlugin().mockRecord(myfun, p1=1)
+        self.assertNotEqual(record_1, record_2)
+        
+    def test_two_record_not_equal_if_both_param_different(self):
+        record_1 = mockPlugin().mockRecord(myfun,1)
+        record_2 = mockPlugin().mockRecord(myfun, p1=1)
+        self.assertNotEqual(record_1, record_2)
+        
+class unexpectedCallExceptionTest(unittest.TestCase):
+    def setUp(self):
+        self.c = myClass()
+        
+    def test_expect_call_not_come(self):
+        expect = mockPlugin().mockRecord(myfun,1)
+        e = mockPlugin().UnexpectedCallError(expect)
+        expectStr = '''
+    Expecting Call: myfun(1)
+'''
+        self.assertEqual(expectStr, str(e))
+        
+    def test_expect_call_not_come_with_string_param(self):
+        expect = mockPlugin().mockRecord(myfun,'1')
+        e = mockPlugin().UnexpectedCallError(expect)
+        expectStr = '''
+    Expecting Call: myfun('1')
+'''
+        self.assertEqual(expectStr, str(e))
+        
+    def test_expect_call_not_come_with_class_param(self):
+        expect = mockPlugin().mockRecord(myfun, self.c)
+        e = mockPlugin().UnexpectedCallError(expect)
+        expectStr = '''
+    Expecting Call: myfun({0})
+'''.format(repr(self.c))
+        self.assertEqual(expectStr, str(e))
+        
+    def test_expect_call_not_come_with_key_param(self):
+        expect = mockPlugin().mockRecord(myfun, '123', p1=1, p2='good afternoon', p3=self.c)
+        e = mockPlugin().UnexpectedCallError(expect)
+        expectStr = '''
+    Expecting Call: myfun('123', p1=1, p2='good afternoon', p3={0})
+'''.format(repr(self.c))
+        self.assertEqual(expectStr, str(e))
+        
+    def test_invalid_call_(self):
+        expect = mockPlugin().mockRecord(myfun, 'happy', p1=600, p2='good afternoon', p3=self.c)
+        real = mockPlugin().mockRecord(sorted, 123, p='bad', test=self.c)
+        e = mockPlugin().UnexpectedCallError(expect, real)
+        expectStr = '''
+    Expecting Call: myfun('happy', p1=600, p2='good afternoon', p3={0})
+    But Is: sorted(123, p='bad', test={1})
+'''.format(repr(self.c),repr(self.c))
+        self.assertEqual(expectStr, str(e))
 
 if __name__=='__main__':
     unittest.main()

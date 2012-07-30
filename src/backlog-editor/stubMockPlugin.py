@@ -89,9 +89,20 @@ class mockPlugin:
         def __init__(self, expectedCallInfo, realCallInfo=None):
             self.expect = expectedCallInfo
             self.real = realCallInfo
-            pass
+            
+            
+        def str_expect_param(self):
+            info = "\n    Expecting Call: " + self.expect.orgFunc.__name__
+            kargStr = ""
+            for k in sorted(self.expect.karg.keys()):
+                kargStr = kargStr + ", " + str(k) + "=" +\
+                 repr(self.expect.karg[k]) 
+            argStr="(" +  ", ".join(repr(v) for v in self.expect.varg) + kargStr + ")"
+            return info + argStr + '\n'
+
         def __repr__(self):
-            return "\n  Expecting Call: sorted('123')\n"
+            errorStr = self.str_expect_param()
+            return errorStr
 
     class mockRecord:
         '''The structured information to be recorded when mock a function
@@ -102,7 +113,7 @@ class mockPlugin:
       the return value 
         '''
         def __init__(self, orgFunc, *varg, **karg):
-            self.orgFunc = orgFunc.__name__
+            self.orgFunc = orgFunc
             self.varg = varg
             self.karg = karg
             self.returnVal = None
@@ -117,10 +128,23 @@ class mockPlugin:
             self.returnVal = val
             
         def __eq__(self, other):
-            if self.orgFunc == other.orgFunc and self.varg == other.varg:
+#            print self.varg, self.karg, other.varg, other.karg
+            if self.orgFunc.__name__ == other.orgFunc.__name__ and self.varg == other.varg and self.karg == other.karg:
                 return True
             else:
                 return False
+            
+        def __ne__(self, other):
+            return not self.__eq__(other)
+        
+        def __repr__(self):
+            info = "\n    Expecting Call: " + self.expect.orgFunc.__name__
+            kargStr = ""
+            for k in sorted(self.expect.karg.keys()):
+                kargStr = kargStr + ", " + str(k) + "=" +\
+                 repr(self.expect.karg[k]) 
+            argStr="(" +  ", ".join(repr(v) for v in self.expect.varg) + kargStr + ")"
+
     
     def __init__(self):
         self.stub = stubPlugin()
@@ -139,12 +163,14 @@ class mockPlugin:
         @functools.wraps(func)
         def mock_func(*varg, **karg):
             firstRecord = self._mockRecordList[0]
-            if firstRecord.orgFunc != mock_func.__name__:
+            if firstRecord.orgFunc.__name__ != mock_func.__name__:
                 realCall = mockPlugin().mockRecord(mock_func, *varg)
                 raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
-            if firstRecord.varg != varg or firstRecord.karg != karg:
-                realCall = mockPlugin().mockRecord(mock_func, *varg)
-                raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
+            if not hasattr(firstRecord.orgFunc, 'im_class'):
+                if firstRecord.varg != varg or firstRecord.karg != karg:
+#                    print varg, firstRecord.varg
+                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
+                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
             self._mockRecordList.pop(0)
             return firstRecord.returnVal
 
