@@ -91,9 +91,9 @@ class mockPlugin:
             self.real = realCallInfo
 
         def __repr__(self):
-            info = "\n    Expecting Call: " + repr(self.expect)
+            info =      "\n    Expecting Call: " + repr(self.expect)
             if self.real: 
-                info += "\n    But Is: " + repr(self.real)
+                info += "\n    But Actual Is:  " + repr(self.real)
             info += "\n"
             return info
 
@@ -122,7 +122,16 @@ class mockPlugin:
             
         def __eq__(self, other):
 #            print self.varg, self.karg, other.varg, other.karg
-            if self.orgFunc.__name__ == other.orgFunc.__name__ and self.varg == other.varg and self.karg == other.karg:
+            if hasattr(self.orgFunc, 'im_class'):
+#                print 'self', dir(self.orgFunc)
+#                print 'other', dir(other.orgFunc)
+#                if hasattr(other.orgFunc, 'im_class'): return False
+#                if self.orgFunc.im_class != other.orgFunc.im_class: return False
+                if len(other.varg)>0 and self.orgFunc.im_self != other.varg[0]:
+                    return False
+            if self.orgFunc.__name__ == other.orgFunc.__name__\
+              and self.varg == other.varg\
+              and self.karg == other.karg:
                 return True
             else:
                 return False
@@ -132,12 +141,18 @@ class mockPlugin:
         
         def __repr__(self):
             callStr = self.orgFunc.__name__
+            argStr = ", ".join(repr(v) for v in self.varg)
+            if hasattr(self.orgFunc, 'im_class'):
+                obj = self.orgFunc.im_class
+                if self.orgFunc.im_self: obj = self.orgFunc.im_self
+                argStr = repr(obj)
+                #if argStr == '': argStr = repr(obj)
+                #else: argStr = repr(obj) + ', ' + argStr
             kargStr = ""
             for k in sorted(self.karg.keys()):
                 kargStr = kargStr + ", " + str(k) + "=" +\
                  repr(self.karg[k]) 
-            callStr += "(" + \
-             ", ".join(repr(v) for v in self.varg) + kargStr + ")"
+            callStr += "(" + argStr + kargStr + ")"
             return callStr 
 
     
@@ -153,19 +168,26 @@ class mockPlugin:
             firstRecord = self._mockRecordList[0]
             self._mockRecordList = []
             raise mockPlugin().UnexpectedCallError(firstRecord)
-    
+        
     def mock_function(self, func):
         @functools.wraps(func)
         def mock_func(*varg, **karg):
             firstRecord = self._mockRecordList[0]
-            if firstRecord.orgFunc.__name__ != mock_func.__name__:
-                realCall = mockPlugin().mockRecord(mock_func, *varg)
+            realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
+            if firstRecord != realCall:
                 raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
-            if not hasattr(firstRecord.orgFunc, 'im_class'):
-                if firstRecord.varg != varg or firstRecord.karg != karg:
-#                    print varg, firstRecord.varg
-                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
-                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
+#            if firstRecord.orgFunc.__name__ != mock_func.__name__:
+#                realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
+#                raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
+#            if hasattr(firstRecord.orgFunc, 'im_class'):
+#                if not isinstance(varg[0], firstRecord.orgFunc.im_class) :
+#                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
+#                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
+#            else:
+#                if firstRecord.varg != varg or firstRecord.karg != karg:
+##                    print varg, firstRecord.varg
+#                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
+#                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
             self._mockRecordList.pop(0)
             return firstRecord.returnVal
 
