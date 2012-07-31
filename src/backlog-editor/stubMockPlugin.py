@@ -43,7 +43,7 @@ class stubPlugin:
         setattr(orgfunc.im_class, orgfunc.__name__, stubfunc)
         
     def _recover_instancemethod(self, orgfunc):
-        setattr(orgfunc.im_class, orgfunc.__name__, orgfunc)
+        setattr(orgfunc.im_class, orgfunc.__name__, orgfunc.im_func)
         
     def _stub_out_general_function(self, orgfunc, stubfunc):
         orgModule = get_module_name(orgfunc)
@@ -78,7 +78,7 @@ def singleton(cls):
 
 @singleton
 class mockPlugin:
-    class UnexpectedCallError:
+    class UnexpectedCallError(BaseException):
         '''The exception raised when user call function not as recorded
         
     It will display the trace information when raised unexpected.
@@ -120,15 +120,42 @@ class mockPlugin:
         def set_return_value(self, val):
             self.returnVal = val
             
+        def __ne_two_class_func(self, other):
+            if self.orgFunc.im_class != other.orgFunc.im_class: 
+                return True
+            if self.orgFunc.im_self and other.orgFunc.im_self:
+                return self.orgFunc.im_self != other.orgFunc.im_self
+            return False
+        
+        def __ne_class_func_to_general_func(self, other):
+            if len(other.varg)==0: return True
+            if self.orgFunc.im_self: 
+                if self.orgFunc.im_self == other.varg[0]:
+                    other.varg = other.varg[1:]
+                else: return True
+            else:
+                if isinstance(other.varg[0], self.orgFunc.im_class):
+                    other.varg = other.varg[1:]
+                else: return True            
+            return False
+
+        def __ne_class_info(self, other):
+            if hasattr(self.orgFunc, 'im_class'):
+                if hasattr(other.orgFunc, 'im_class'):
+                    if self.__ne_two_class_func(other): 
+                        return True
+                else:
+                    if self.__ne_class_func_to_general_func(other):
+                        return True
+            else:
+                if hasattr(other.orgFunc, 'im_class'):
+                    if other.__ne_class_func_to_general_func(self):
+                        return True
+            return False
+
         def __eq__(self, other):
 #            print self.varg, self.karg, other.varg, other.karg
-            if hasattr(self.orgFunc, 'im_class'):
-#                print 'self', dir(self.orgFunc)
-#                print 'other', dir(other.orgFunc)
-#                if hasattr(other.orgFunc, 'im_class'): return False
-#                if self.orgFunc.im_class != other.orgFunc.im_class: return False
-                if len(other.varg)>0 and self.orgFunc.im_self != other.varg[0]:
-                    return False
+            if self.__ne_class_info(other): return False
             if self.orgFunc.__name__ == other.orgFunc.__name__\
               and self.varg == other.varg\
               and self.karg == other.karg:
@@ -145,9 +172,8 @@ class mockPlugin:
             if hasattr(self.orgFunc, 'im_class'):
                 obj = self.orgFunc.im_class
                 if self.orgFunc.im_self: obj = self.orgFunc.im_self
-                argStr = repr(obj)
-                #if argStr == '': argStr = repr(obj)
-                #else: argStr = repr(obj) + ', ' + argStr
+                if argStr == '': argStr = repr(obj)
+                else: argStr = repr(obj) + ', ' + argStr
             kargStr = ""
             for k in sorted(self.karg.keys()):
                 kargStr = kargStr + ", " + str(k) + "=" +\

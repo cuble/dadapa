@@ -45,7 +45,6 @@ class mockPluginTest(unittest.TestCase):
         except mockPlugin().UnexpectedCallError:
             #accessed private member just for test
             self.assertEqual([],self.mock._mockRecordList)
-
         
     def test_mock_is_a_singerton(self):
         mock=mockPlugin()
@@ -176,6 +175,24 @@ class mockRecordTest(unittest.TestCase):
         record_2 = mockPlugin().mockRecord(myfun, 1, p2=2, p1=1)
         self.assertEqual(record_1, record_2)
         
+    def test_class_record_equal_to_instance_record(self):
+        record_1 = mockPlugin().mockRecord(myClass.fun, 1, p1=1, p2=2)
+        c = myClass()
+        record_2 = mockPlugin().mockRecord(c.fun, 1, p2=2, p1=1)
+        self.assertEqual(record_1, record_2)
+        
+    def test_instance_record_equal_to_class_record(self):
+        c = myClass()
+        record_1 = mockPlugin().mockRecord(c.fun, 1, p2=2, p1=1)
+        record_2 = mockPlugin().mockRecord(myClass.fun, 1, p1=1, p2=2)
+        self.assertEqual(record_1, record_2)
+        
+    def test_class_record_equal_to_special_function(self):
+        record_1 = mockPlugin().mockRecord(myClass.myfun, 1, p2=2, p1=1)
+        c = myClass()
+        record_2 = mockPlugin().mockRecord(myfun, c, 1, p1=1, p2=2)
+        self.assertEqual(record_1, record_2)
+        
     def test_two_record_not_equal_if_func_name_different(self):
         record_1 = mockPlugin().mockRecord(myfun)
         record_2 = mockPlugin().mockRecord(round)
@@ -199,9 +216,26 @@ class mockRecordTest(unittest.TestCase):
     
     def test_two_record_not_equal_if_class_type_different(self):
         c = myClass()
-        c2 = myClass()
+        c2 = myClass2()
         record_1 = mockPlugin().mockRecord(c.fun)
         record_2 = mockPlugin().mockRecord(c2.fun)
+        self.assertNotEqual(record_1, record_2)
+        
+    def test_two_record_not_equal_if_instance_different(self):
+        c = myClass()
+        c_ = myClass()
+        record_1 = mockPlugin().mockRecord(c.fun)
+        record_2 = mockPlugin().mockRecord(c_.fun)
+        self.assertNotEqual(record_1, record_2)
+        
+    def test_class_function_record_not_equal_to_general_function(self):
+        record_1 = mockPlugin().mockRecord(myClass.myfun)
+        record_2 = mockPlugin().mockRecord(myfun)
+        self.assertNotEqual(record_1, record_2)
+        
+    def test_general_function_record_not_equal_to_class_function(self):
+        record_1 = mockPlugin().mockRecord(myfun, 1)
+        record_2 = mockPlugin().mockRecord(myClass.myfun)
         self.assertNotEqual(record_1, record_2)
         
 class unexpectedCallExceptionTest(unittest.TestCase):
@@ -241,11 +275,8 @@ class unexpectedCallExceptionTest(unittest.TestCase):
         self.assertEqual(expectStr, repr(e))
         
     def test_expect_class_call_not_come(self):
-        print myClass2.fun.im_class, '**', myClass2.fun.im_self
-        print myClass, myClass.fun
         expect = mockPlugin().mockRecord(myClass.fun)
-        e = mockPlugin().UnexpectedCallError(expect)
-        print expect.orgFunc.im_class, '**', expect.orgFunc.im_self 
+        e = mockPlugin().UnexpectedCallError(expect) 
         expectStr = '''
     Expecting Call: fun({0})
 '''.format(repr(myClass))
@@ -253,10 +284,10 @@ class unexpectedCallExceptionTest(unittest.TestCase):
         
     def test_expect_instance_call_not_come(self):
         c = myClass()
-        expect = mockPlugin().mockRecord(c.fun)
+        expect = mockPlugin().mockRecord(c.fun, 1, p1='1')
         e = mockPlugin().UnexpectedCallError(expect)
         expectStr = '''
-    Expecting Call: fun({0})
+    Expecting Call: fun({0}, 1, p1='1')
 '''.format(repr(c))
         self.assertEqual(expectStr, repr(e))
         

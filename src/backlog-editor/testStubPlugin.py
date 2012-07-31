@@ -77,6 +77,7 @@ class stubPluginTest(unittest.TestCase):
         self.assertEqual(456, mc.fun())
         self.stub.teardown()
         self.assertEqual('fun', mc.fun.__name__)
+        self.assertEqual(None, myclass.fun.im_self)
         
     def test_stub_instance_func_is_the_same_as_stub_class_func(self):
         mc=myclass()
@@ -85,6 +86,7 @@ class stubPluginTest(unittest.TestCase):
         self.assertEqual(456, mc1.fun())
         self.stub.teardown()
         self.assertEqual('fun', mc1.fun.__name__)
+        self.assertEqual(mc1, mc1.fun.im_self)
 
     @ignoreIfwxPythonNotInstalled()
     def test_stub_wx_app_func(self):
