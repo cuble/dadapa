@@ -1,0 +1,8 @@
+#! /bin/bash
+#This is a script designed to do component continous integration
+
+# Check if files in src/ changed
+#**Need to be implemented
+
+./runTest.py
+
