@@ -11,8 +11,9 @@ function do_update() {
   echo "update cpputest per month"
   record_date
   new_rev=`svn up|grep "At revision"`
-  new_rev=${new_rev:12}
+  new_rev=${new_rev:12:3}
   org_rev=${org_rev:10}
+  echo "new_rev: $new_rev org_rev: $org_rev"
   if [ $new_rev -eq $org_rev ]; then
     echo "no version change"
   else
