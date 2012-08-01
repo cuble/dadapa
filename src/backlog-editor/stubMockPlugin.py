@@ -68,6 +68,8 @@ class stubPlugin:
         self.orgfuncList=[]
 
 
+
+
 def singleton(cls):
     instances = {}
     def getinstance():
@@ -96,6 +98,9 @@ class mockPlugin:
                 info += "\n    But Actual Is:  " + repr(self.real)
             info += "\n"
             return info
+        
+        def __str__(self):
+            return self.__repr__()
 
     class mockRecord:
         '''The structured information to be recorded when mock a function
@@ -154,7 +159,6 @@ class mockPlugin:
             return False
 
         def __eq__(self, other):
-#            print self.varg, self.karg, other.varg, other.karg
             if self.__ne_class_info(other): return False
             if self.orgFunc.__name__ == other.orgFunc.__name__\
               and self.varg == other.varg\
@@ -194,32 +198,30 @@ class mockPlugin:
             firstRecord = self._mockRecordList[0]
             self._mockRecordList = []
             raise mockPlugin().UnexpectedCallError(firstRecord)
-        
+
+    def _regenerate_org_function(self, orgFunc, mockedFunc):
+        if hasattr(orgFunc, 'im_self'):
+            return type(orgFunc)(orgFunc.im_func, mockedFunc.im_self, orgFunc.im_class)
+        else:
+            return orgFunc
+    
     def mock_function(self, func):
+        if hasattr(func, 'im_org'):
+            func = self._regenerate_org_function(func.im_org, func)
+
         @functools.wraps(func)
         def mock_func(*varg, **karg):
             firstRecord = self._mockRecordList[0]
             realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
             if firstRecord != realCall:
                 raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
-#            if firstRecord.orgFunc.__name__ != mock_func.__name__:
-#                realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
-#                raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
-#            if hasattr(firstRecord.orgFunc, 'im_class'):
-#                if not isinstance(varg[0], firstRecord.orgFunc.im_class) :
-#                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
-#                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
-#            else:
-#                if firstRecord.varg != varg or firstRecord.karg != karg:
-##                    print varg, firstRecord.varg
-#                    realCall = mockPlugin().mockRecord(mock_func, *varg, **karg)
-#                    raise mockPlugin().UnexpectedCallError(firstRecord, realCall)
             self._mockRecordList.pop(0)
             return firstRecord.returnVal
 
         record = mockPlugin().mockRecord(func)
         self._mockRecordList.append(record)
         self.stub.stub_out(func, mock_func)
+        mock_func.im_org = func
         return self
         
     def with_param(self, *varg, **karg):
