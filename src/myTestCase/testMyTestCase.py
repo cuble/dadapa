@@ -18,49 +18,83 @@ import unittest
 import sys
 
 from myTestCase import printPlugin
-from myTestCase import myTestCase
 
-import stubMockPlugin
+import myTestCase
 
-def init_stub(self):
-    pass
+class testPlugin:
+    def setUp(self, target):
+        self.setUp_called = True
+        self.target = target
+        
+    def tearDown(self):
+        self.tearDown_called = True
 
-class myTestCaseTest(unittest.TestCase):
+class myTestCaseTest(myTestCase.myTestCase):
     def setUp(self):
-        self.org_init = myTestCase.__init__
-        myTestCase.__init__ = init_stub
-        self.mytc=myTestCase()
-        self.mytc.setUp()
-        
-    def _check_mytc_data_units(self, mytc):
-        self.assert_(isinstance(mytc._pp, printPlugin))
-        self.assert_(isinstance(mytc._ps, stubMockPlugin.stubPlugin))
-        self.assert_(mytc._pm == stubMockPlugin.mockPlugin())
-        
-    def _check_mytc_function_interface_units(self, mytc):
-        self.assertEqual(mytc.check_print_result, mytc._pp.check_print_result)
-        self.assertEqual(mytc.stub_out, mytc._ps.stub_out)
-        self.assertEqual(mytc.mock_function, mytc._pm.mock_function)
-        self.assertEqual(mytc.with_param, mytc._pm.with_param)
-        self.assertEqual(mytc.and_return, mytc._pm.and_return)
+        #To Shadow myTestCase's setUp
+        self.assertFalse(hasattr(self, 'mySetupCalled'))
+        self.assertFalse(hasattr(self, 'myTeardownCalled'))
 
-    def test_no_operation_should_success(self):
-        self._check_mytc_data_units(self.mytc)
-        self._check_mytc_function_interface_units(self.mytc)
-        self.assertRaises(None, self.mytc.tearDown())
-        myTestCase.__init__ = self.org_init
+    def tearDown(self):
+        #To Shadow myTestCase's tearDown
+        self.assertTrue(self.mySetupCalled)
+        self.assertTrue(self.myTeardownCalled)
+    
+    def my_setup(self):
+        self.mySetupCalled = True
+        
+    def my_teardown(self):
+        self.myTeardownCalled = True
+    
+    def _install_testPlugin_into_plugin_list(self):
+        self.tp = testPlugin()
+        self.assertFalse(hasattr(self.tp, 'setUp_called'))
+        self.assertFalse(hasattr(self.tp, 'tearDown_called'))
+
+        self.org_list = myTestCase._PLUGINLIST
+        myTestCase._PLUGINLIST = [self.tp]
+
+    def test_functionanity_with_test_plugin(self):
+        self._install_testPlugin_into_plugin_list()
+        super(myTestCaseTest, self).setUp()
+        self.assertTrue(self.tp.setUp_called) 
+        self.assertEqual(self.tp.target, self)       
+        super(myTestCaseTest, self).tearDown()
+        self.assertTrue(self.tp.tearDown_called)
+        myTestCase._PLUGINLIST = self.org_list
+
+    def _check_plugin_install_result(self):
+        self.assert_(hasattr(self, 'check_print_result'))
+        self.assert_(hasattr(self, 'stub_out'))
+        self.assert_(hasattr(self, 'mock_function'))
+        self.assert_(hasattr(self, 'with_param'))
+        self.assert_(hasattr(self, 'and_return'))
+
+    def test_real_function_result(self):
+        self.assertTrue(hasattr(super(myTestCaseTest, self), 'my_setup'))
+        self.assertTrue(hasattr(super(myTestCaseTest, self), 'my_teardown'))
+        super(myTestCaseTest, self).setUp()
+        self._check_plugin_install_result()
+        super(myTestCaseTest, self).tearDown()
+
+
+class myclass:
+    pass
 
 class printPluginTest(unittest.TestCase):
     def setUp(self):
         printPlugin.runTest = None
         self.plugin = printPlugin()
-        self.plugin.setUp()
+        self.target = myclass()
+        self.plugin.setUp(self.target)
+        
     
     def tearDown(self):
-        sys.stdout = self.plugin.org_stdout
+        self.assert_(sys.stdout == self.plugin.org_stdout)
         
     def test_no_operation_should_success(self):
-        self.plugin.tearDown()
+        self.assertEqual(self.plugin.check_print_result, self.target.check_print_result)
+        self.assertRaises(None, self.plugin.tearDown())
 
     def test_fail_if_print_output_not_checked(self):
         testString = 'Printed should be redirected for later checking'
@@ -78,7 +112,10 @@ class printPluginTest(unittest.TestCase):
 
     def test_fail_if_print_result_wrong(self):
         print '123'
-        self.assertRaises(AssertionError, self.plugin.check_print_result, '456')
+        with self.assertRaises(AssertionError):
+            self.plugin.check_print_result('456')
+        with self.assertRaises(AssertionError):
+            self.plugin.tearDown()
         
     def test_success_when_print_and_check_several_times(self):
         print '123'
@@ -96,9 +133,8 @@ class printPluginTest(unittest.TestCase):
         
     def test_stdout_should_recover_even_teardown_failed(self):
         print '123'
-        self.assertRaises(AssertionError, self.plugin.tearDown) 
-        self.assertEqual(sys.stdout, self.plugin.org_stdout)
-
+        with self.assertRaises(AssertionError):
+            self.plugin.tearDown()
 
 if __name__=='__main__':
     unittest.main()

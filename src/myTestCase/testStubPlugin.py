@@ -54,12 +54,18 @@ class stubPluginTest(unittest.TestCase):
         
     def tearDown(self):
         self.assertEqual([], self.stub.orgfuncList)
+        
+    def test_plugin_setup(self):
+        target = myclass()
+        self.stub.setUp(target)
+        self.assertEqual(self.stub.stub_out, target.stub_out)
+        
     
     def _stub_a_func_success_test(self, target):
         self.stub.stub_out(target, stubfun)
         module=get_module_name(target)
         self.assertEqual(456, sys.modules[module].__dict__[target.__name__]())
-        self.stub.teardown()
+        self.stub.tearDown()
         self.assertEqual(target.__name__, sys.modules[module].__dict__[target.__name__].__name__)
         
     def test_stub_myfun(self):
@@ -75,7 +81,7 @@ class stubPluginTest(unittest.TestCase):
         self.stub.stub_out(myclass.fun, stubfun_with_one_param)
         mc=myclass()
         self.assertEqual(456, mc.fun())
-        self.stub.teardown()
+        self.stub.tearDown()
         self.assertEqual('fun', mc.fun.__name__)
         self.assertEqual(None, myclass.fun.im_self)
         
@@ -84,7 +90,7 @@ class stubPluginTest(unittest.TestCase):
         mc1=myclass()
         self.stub.stub_out(mc.fun, stubfun_with_one_param)
         self.assertEqual(456, mc1.fun())
-        self.stub.teardown()
+        self.stub.tearDown()
         self.assertEqual('fun', mc1.fun.__name__)
         self.assertEqual(mc1, mc1.fun.im_self)
 
@@ -93,7 +99,7 @@ class stubPluginTest(unittest.TestCase):
         self.stub.stub_out(wx.App.__init__, stub_init_fun)
         ma = wx.App()
         self.assertEqual(456, ma.param)
-        self.stub.teardown()
+        self.stub.tearDown()
         self.assertEqual('__init__', wx.App.__init__.__name__)
         
     def test_stub_unsupported_func_type_failed(self):
@@ -113,7 +119,7 @@ class stubPluginTest(unittest.TestCase):
         self.assertEqual(456, mc.fun())
         self.assertEqual(456, ma.param)
         self.assertEqual(456, os.listdir())
-        self.stub.teardown()
+        self.stub.tearDown()
         self.assertEqual('myfun', myfun.__name__)
         self.assertEqual('fun', mc.fun.__name__)
         self.assertEqual('__init__', wx.App.__init__.__name__)

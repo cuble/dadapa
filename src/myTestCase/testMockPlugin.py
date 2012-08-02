@@ -23,21 +23,22 @@ from stubMockPlugin import mockPlugin
 def myfun():
     return 123
 
-class myClass:
+class myclass:
     def fun(self):
-        return 'myClass.fun'
+        return 'myclass.fun'
     
     def myfun(self):
-        return 'myClass.myfun'
+        return 'myclass.myfun'
 
-class myClass2:
+class myclass2:
     def fun(self):
-        return "myClass2.fun"
+        return "myclass2.fun"
     
 class mockPluginTest(unittest.TestCase):
     def setUp(self):
         self.mock = mockPlugin()
-        self.mock.setUp()
+        self.target = myclass()
+        self.mock.setUp(self.target)
         
     def tearDown(self):
         try:
@@ -51,6 +52,9 @@ class mockPluginTest(unittest.TestCase):
         self.assertEqual(mock, self.mock)
         
     def test_success_if_no_operation(self):
+        self.assertEqual(self.mock.mock_function, self.target.mock_function)
+        self.assertEqual(self.mock.with_param, self.target.with_param)
+        self.assertEqual(self.mock.and_return, self.target.and_return)
         self.assertRaises(None, self.mock.tearDown())
     
     def test_sucess_mock_myfun(self):
@@ -73,11 +77,11 @@ class mockPluginTest(unittest.TestCase):
         self.assertEqual(orgfun, os.chdir)
 
     def test_success_mock_function_in_myclass(self):
-        self.mock.mock_function(myClass.fun).with_param(1, p1='1').and_return(2)
-        c=myClass()
+        self.mock.mock_function(myclass.fun).with_param(1, p1='1').and_return(2)
+        c=myclass()
         self.assertEqual(2, c.fun(1, p1='1'))
         self.mock.tearDown()
-        self.assertEqual('myClass.fun', c.fun())
+        self.assertEqual('myclass.fun', c.fun())
         
     def test_success_mock_buitin_function(self):
         self.mock.mock_function(round).with_param('123').and_return(10)
@@ -94,7 +98,7 @@ class mockPluginTest(unittest.TestCase):
         self.mock.mock_function(myfun).and_return('myfun')
         self.mock.mock_function(round).with_param('AnythingIsOk', p='aKeyParam')
         self.mock.mock_function(os.chdir).with_param('..').and_return('aObject')
-        c = myClass()
+        c = myclass()
         self.mock.mock_function(c.fun)
 
         self.assertEqual('myfun', myfun())
@@ -106,7 +110,7 @@ class mockPluginTest(unittest.TestCase):
         self.assertEqual(123, myfun())
         self.assertEqual(2.0, round(1.5))
         self.assertEqual(None, os.chdir('.'))
-        self.assertEqual('myClass.fun', c.fun())
+        self.assertEqual('myclass.fun', c.fun())
         
     def test_mock_mocked_function_is_ok(self):
         self.mock.mock_function(myfun)
@@ -118,10 +122,10 @@ class mockPluginTest(unittest.TestCase):
         self.assertEqual(2, myfun('2'))
         
     def test_mock_mocked_class_function_is_ok(self):
-        c1 = myClass()
-        c2 = myClass()
+        c1 = myclass()
+        c2 = myclass()
         self.mock.mock_function(c1.fun)
-        self.mock.mock_function(myClass.fun).with_param(p='p')
+        self.mock.mock_function(myclass.fun).with_param(p='p')
         self.assertEqual(None, c1.fun())
         self.assertEqual(None, c2.fun(p='p'))
 
@@ -166,11 +170,11 @@ class mockPluginTest(unittest.TestCase):
 
 
     def test_fail_if_class_type_different(self):
-        self.mock.mock_function(myClass.myfun)
+        self.mock.mock_function(myclass.myfun)
         self.mock.mock_function(myfun)
         with self.assertRaises(mockPlugin().UnexpectedCallError) as cm:
             myfun()
-        expect = mockPlugin().mockRecord(myClass.myfun)
+        expect = mockPlugin().mockRecord(myclass.myfun)
         real = mockPlugin().mockRecord(myfun)
         self._check_unexpectedCall_exception_content(cm.exception, expect, real)
 
@@ -192,20 +196,20 @@ class mockRecordTest(unittest.TestCase):
         self.assertEqual(record_1, record_2)
         
     def test_class_record_equal_to_instance_record(self):
-        record_1 = mockPlugin().mockRecord(myClass.fun, 1, p1=1, p2=2)
-        c = myClass()
+        record_1 = mockPlugin().mockRecord(myclass.fun, 1, p1=1, p2=2)
+        c = myclass()
         record_2 = mockPlugin().mockRecord(c.fun, 1, p2=2, p1=1)
         self.assertEqual(record_1, record_2)
         
     def test_instance_record_equal_to_class_record(self):
-        c = myClass()
+        c = myclass()
         record_1 = mockPlugin().mockRecord(c.fun, 1, p2=2, p1=1)
-        record_2 = mockPlugin().mockRecord(myClass.fun, 1, p1=1, p2=2)
+        record_2 = mockPlugin().mockRecord(myclass.fun, 1, p1=1, p2=2)
         self.assertEqual(record_1, record_2)
         
     def test_class_record_equal_to_special_function(self):
-        record_1 = mockPlugin().mockRecord(myClass.myfun, 1, p2=2, p1=1)
-        c = myClass()
+        record_1 = mockPlugin().mockRecord(myclass.myfun, 1, p2=2, p1=1)
+        c = myclass()
         record_2 = mockPlugin().mockRecord(myfun, c, 1, p1=1, p2=2)
         self.assertEqual(record_1, record_2)
         
@@ -231,32 +235,32 @@ class mockRecordTest(unittest.TestCase):
         
     
     def test_two_record_not_equal_if_class_type_different(self):
-        c = myClass()
-        c2 = myClass2()
+        c = myclass()
+        c2 = myclass2()
         record_1 = mockPlugin().mockRecord(c.fun)
         record_2 = mockPlugin().mockRecord(c2.fun)
         self.assertNotEqual(record_1, record_2)
         
     def test_two_record_not_equal_if_instance_different(self):
-        c = myClass()
-        c_ = myClass()
+        c = myclass()
+        c_ = myclass()
         record_1 = mockPlugin().mockRecord(c.fun)
         record_2 = mockPlugin().mockRecord(c_.fun)
         self.assertNotEqual(record_1, record_2)
         
     def test_class_function_record_not_equal_to_general_function(self):
-        record_1 = mockPlugin().mockRecord(myClass.myfun)
+        record_1 = mockPlugin().mockRecord(myclass.myfun)
         record_2 = mockPlugin().mockRecord(myfun)
         self.assertNotEqual(record_1, record_2)
         
     def test_general_function_record_not_equal_to_class_function(self):
         record_1 = mockPlugin().mockRecord(myfun, 1)
-        record_2 = mockPlugin().mockRecord(myClass.myfun)
+        record_2 = mockPlugin().mockRecord(myclass.myfun)
         self.assertNotEqual(record_1, record_2)
         
 class unexpectedCallExceptionTest(unittest.TestCase):
     def setUp(self):
-        self.c = myClass()
+        self.c = myclass()
         
     def test_expect_call_not_come(self):
         expect = mockPlugin().mockRecord(myfun,1)
@@ -291,15 +295,15 @@ class unexpectedCallExceptionTest(unittest.TestCase):
         self.assertEqual(expectStr, str(e))
         
     def test_expect_class_call_not_come(self):
-        expect = mockPlugin().mockRecord(myClass.fun)
+        expect = mockPlugin().mockRecord(myclass.fun)
         e = mockPlugin().UnexpectedCallError(expect) 
         expectStr = '''
     Expecting Call: fun({0})
-'''.format(repr(myClass))
+'''.format(repr(myclass))
         self.assertEqual(expectStr, str(e))
         
     def test_expect_instance_call_not_come(self):
-        c = myClass()
+        c = myclass()
         expect = mockPlugin().mockRecord(c.fun, 1, p1='1')
         e = mockPlugin().UnexpectedCallError(expect)
         expectStr = '''

@@ -61,8 +61,10 @@ class stubPlugin:
         else:
             raise TypeError("can't stub function type: {0}".format(str(funcType)))
         
+    def setUp(self, target):
+        target.stub_out = self.stub_out
         
-    def teardown(self):
+    def tearDown(self):
         for orgfunc in self.orgfuncList:
             self.stubImpDict[type(orgfunc)].do_recover(orgfunc)
         self.orgfuncList=[]
@@ -189,11 +191,15 @@ class mockPlugin:
     def __init__(self):
         self.stub = stubPlugin()
     
-    def setUp(self):
+    def setUp(self, target):
         self._mockRecordList = []
+        target.mock_function = self.mock_function
+        target.with_param = self.with_param
+        target.and_return = self.and_return
+
 
     def tearDown(self):
-        self.stub.teardown()
+        self.stub.tearDown()
         if self._mockRecordList != []: 
             firstRecord = self._mockRecordList[0]
             self._mockRecordList = []

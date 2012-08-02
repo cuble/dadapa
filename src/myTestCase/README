@@ -29,12 +29,19 @@ Basic usage:
 	
 	def test_functions_with_print(self):
 		#print result should be checked, or case will fail
-		print('hello world')
-		self.check_output('hello world')
-		pass
+		print 'hello world'
+		self.check_output('hello world\n')
 		
 	def test_stub_a_function(self):
-		pass
+		#stubed function will be recovered automatically
+		import os
+		self.stub_out(os.listdir)
+		
+	def test_mock_a_function(self):
+		#mocked functions should be called in mocked sequence
+		import os
+		self.mock_function(os.listdir).with_param('path').and_return([])
+		self.assertEquan([], os.listdir('path')
 
 myTestCase is Copyright 2012 Chen Gang(fouryusteel@gmail.com), and licensed under 
 the Apache License, Version 2.0; see the license copy for details.

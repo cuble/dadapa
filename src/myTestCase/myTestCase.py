@@ -18,25 +18,9 @@
 import unittest
 import sys
 from cStringIO import StringIO
+
 import stubMockPlugin
 
-
-
-class myTestCase(unittest.TestCase):
-    def setUp(self):
-        self._pp = printPlugin()
-        self.check_print_result = self._pp.check_print_result
-        self._ps = stubMockPlugin.stubPlugin()
-        self.stub_out = self._ps.stub_out
-        self._pm = stubMockPlugin.mockPlugin()
-        self.mock_function = self._pm.mock_function
-        self.with_param = self._pm.with_param
-        self.and_return = self._pm.and_return
-        #
-#    def tearDown(self):
-#        print 'myTestCase tearDown'
-#        self.my_teardown()
-    pass
 
 def assert_equal(expected, real):
     assert expected==real, '{0} != {1}'.format(expected, real)
@@ -45,6 +29,7 @@ class printPlugin:
     def setUp(self, target):
         self.org_stdout = sys.stdout
         sys.stdout = StringIO()
+        target.check_print_result = self.check_print_result
 
     def tearDown(self):
         try:
@@ -56,4 +41,26 @@ class printPlugin:
         assert_equal(expectedString, sys.stdout.getvalue())
         sys.stdout = StringIO()
 
+_PLUGINLIST = [printPlugin(),
+               stubMockPlugin.stubPlugin(), 
+               stubMockPlugin.mockPlugin()]
+
+class myTestCase(unittest.TestCase):
+    def setUp(self):
+        for plugin in _PLUGINLIST:
+            plugin.setUp(self)
+            
+        self.my_setup()
+
+    def tearDown(self):
+        for plugin in _PLUGINLIST:
+            plugin.tearDown()
+            
+        self.my_teardown()
+
+    def my_setup(self):
+        pass
+    
+    def my_teardown(self):
+        pass
 

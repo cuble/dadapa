@@ -16,7 +16,8 @@
 
 from distutils.core import setup
 
-setup(name='myTestCase',
+if __name__=='__main__':
+    setup(name='myTestCase',
       version='0.1',
       py_modules=['myTestCase', 'stubMockPlugin'],
       url='https://github.com/cuble/dadapa/tree/master/src/myTestCase',
