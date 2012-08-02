@@ -1,21 +1,54 @@
+#! /usr/bin/env python
+
+#   Copyright 2012 Chen Gang(fouryusteel@gmail.com)
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import unittest
 import sys
 
 from myTestCase import printPlugin
 from myTestCase import myTestCase
 
-class testSut:
+import stubMockPlugin
+
+def init_stub(self):
     pass
 
 class myTestCaseTest(unittest.TestCase):
     def setUp(self):
-        myTestCase.runTest = None  #To make unittest.TestCase.__init__ pass
-        self.myTestCase = myTestCase()
-        self.myTestCase.setUp()
-        self.sut = testSut()
+        self.org_init = myTestCase.__init__
+        myTestCase.__init__ = init_stub
+        self.mytc=myTestCase()
+        self.mytc.setUp()
+        
+    def _check_mytc_data_units(self, mytc):
+        self.assert_(isinstance(mytc._pp, printPlugin))
+        self.assert_(isinstance(mytc._ps, stubMockPlugin.stubPlugin))
+        self.assert_(mytc._pm == stubMockPlugin.mockPlugin())
+        
+    def _check_mytc_function_interface_units(self, mytc):
+        self.assertEqual(mytc.check_print_result, mytc._pp.check_print_result)
+        self.assertEqual(mytc.stub_out, mytc._ps.stub_out)
+        self.assertEqual(mytc.mock_function, mytc._pm.mock_function)
+        self.assertEqual(mytc.with_param, mytc._pm.with_param)
+        self.assertEqual(mytc.and_return, mytc._pm.and_return)
 
-    def test_init_should_success(self):
-        self.myTestCase.tearDown()
+    def test_no_operation_should_success(self):
+        self._check_mytc_data_units(self.mytc)
+        self._check_mytc_function_interface_units(self.mytc)
+        self.assertRaises(None, self.mytc.tearDown())
+        myTestCase.__init__ = self.org_init
 
 class printPluginTest(unittest.TestCase):
     def setUp(self):

@@ -1,0 +1,40 @@
+myTestCase is an open source UT framework for Python. It's designed to 
+simplify TDD with Python. It's derived from unittest.TestCase. 
+
+Features:
+	1. stdout is redirected in myTestCase, print result should be checked
+	2. function stubed by myTestCase will be unstub automatically
+	3. mock generation function and class function are supported  
+
+To install:
+
+  $ python setup.py install
+
+To run myTestCase's internal tests:
+
+  $ python runTest.py
+
+Basic usage:
+
+  import myTestCase
+
+  class PersonTest(myTestCase.myTestCase):
+	def my_setup(self):
+		#do your specifical setup, don't use setUp
+	  	pass
+	 
+	def my_teardown(self):
+		#do your specifical teardown, don't use TearDown
+		pass
+	
+	def test_functions_with_print(self):
+		#print result should be checked, or case will fail
+		print('hello world')
+		self.check_output('hello world')
+		pass
+		
+	def test_stub_a_function(self):
+		pass
+
+myTestCase is Copyright 2012 Chen Gang(fouryusteel@gmail.com), and licensed under 
+the Apache License, Version 2.0; see the license copy for details.

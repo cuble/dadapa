@@ -4,5 +4,5 @@
 # Check if files in src/ changed
 #**Need to be implemented
 
-./runTest.py
+python runTest.py
 
