@@ -4,7 +4,7 @@ simplify TDD with Python. It's derived from unittest.TestCase.
 Features:
 	1. stdout is redirected in myTestCase, print result should be checked
 	2. function stubed by myTestCase will be unstub automatically
-	3. mock generation function and class function are supported  
+	3. mock general function and class function are both supported  
 
 To install:
 
@@ -17,6 +17,9 @@ To run myTestCase's internal tests:
 Basic usage:
 
   import myTestCase
+
+  def listdir_stub(p):
+      pass
 
   class PersonTest(myTestCase.myTestCase):
 	def my_setup(self):
@@ -35,7 +38,7 @@ Basic usage:
 	def test_stub_a_function(self):
 		#stubed function will be recovered automatically
 		import os
-		self.stub_out(os.listdir)
+		self.stub_out(os.listdir, listdir_stub)
 		
 	def test_mock_a_function(self):
 		#mocked functions should be called in mocked sequence
