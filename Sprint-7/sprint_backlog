@@ -1,0 +1,11 @@
+Period: 2012-8-8 ~ 2012-8-21
+
+Committed Items:
+backlog-editor first version
+  - Determine the program architecture of the backlog-editor viewer
+  - Determine the GUI style of the backlog-editor viewer
+  - complete the priority 1 task in the mind map
+
+Not Committed Items:
+x. Study on software distribute and upgrade framework
+x. study test coverage problem in python
