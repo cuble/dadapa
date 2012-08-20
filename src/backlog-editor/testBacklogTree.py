@@ -5,7 +5,7 @@ class testFile:
     def close(self):
         pass
 
-class ownInterfaceTest(mtc.myTestCase):
+class myInterfaceTest(mtc.myTestCase):
     def test_my_open_is_wrap_to_open(self):
         fileName = 'another file'
         flag = 'w+'
@@ -59,6 +59,18 @@ class fileTest:
             [backlogTree.backlogTree('first level sub content 2: sub item')]
                                  )
          ]
+    ),
+    ('Three level subTree',
+        ['first level sub content 1\n',
+         '  second level sub content 1\n',
+         '    third level sub content 1\n'],
+         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
+            [backlogTree.backlogTree('second level sub content 1', backlogTree.backlogTree.defaultAttr,
+                [backlogTree.backlogTree('third level sub content 1')]
+                                    )
+            ]
+                                 )
+         ]
     )
 ]
 
@@ -77,8 +89,8 @@ class fileTest:
         bt = backlogTree.backlogTree()
         bt.init_from_file(self.name)
         testCase.assertEqual(self.name, bt._content)
-        testCase.assertEqual(bt._attribute, defaultAttr)
-        testCase.assertEqual(bt._subTree, self.subTree)
+        testCase.assertEqual(defaultAttr, bt._attribute)
+        testCase.assertEqual(self.subTree, bt._subTree)
             
 class backlogTreeTest(mtc.myTestCase):
     def my_setup(self):
@@ -102,7 +114,7 @@ class backlogTreeTest(mtc.myTestCase):
         bt = backlogTree.backlogTree(content, attribute)
         self._check_backlog_tree_content(bt, content, attribute, [])
                 
-    def test_init_blank_tree_from_file_other_cases(self):
+    def test_init_blank_tree_from_file(self):
         testCaseNum = len(fileTest.testDataForBlankTreeInit)
         for i in range(testCaseNum):
             ft = fileTest(*fileTest.testDataForBlankTreeInit[i])
@@ -110,15 +122,14 @@ class backlogTreeTest(mtc.myTestCase):
 
     def test_init_one_node_tree_from_file_filename_is_ignored(self):
         fileName = 'a backlog'
-        content = ['sub content 1\n', 'sub content 2\n']
+        content = ['sub content 1\n']
         self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
         self.mock_function(backlogTree.my_close).with_param(content)
         bt = backlogTree.backlogTree('root node', {'priority':2})
         bt.init_from_file(fileName)
         self.assertEqual('root node', bt._content)
         self.assertEqual({'priority':2}, bt._attribute)
-        self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1', {'priority':2}),
-                                       backlogTree.backlogTree('sub content 2', {'priority':2})])
+        self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1', {'priority':2})])
         
 if __name__ == '__main__':
     import unittest

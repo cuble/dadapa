@@ -14,18 +14,21 @@ class backlogTree:
         if not subTree: self._subTree = []
         
     def _create_sub_node(self, item):
-        item = item.strip()
-        btNode = backlogTree(item, self._attribute)
-        self._subTree.append(btNode)
+        itemCore = item.strip()
+        btNode = backlogTree(itemCore, self._attribute)
+        if ' ' == item[0] or '\t' == item[0]: 
+            self._subTree[-1]._subTree.append(btNode)
+        else: self._subTree.append(btNode)
+
+    def _create_sub_tree_from_file(self, f):
+        for item in f:
+            if item.isspace(): continue
+            self._create_sub_node(item)
         
     def init_from_file(self, fileName):
         f=my_open(fileName)
         if not self._content: self._content = fileName
-        for item in f:
-            if item.isspace(): continue
-            if ' ' == item[0] or '\t' == item[0]: 
-                self._subTree[-1]._create_sub_node(item)
-            else: self._create_sub_node(item)
+        self._create_sub_tree_from_file(f)
         my_close(f)
             
     def __eq__(self, other):
