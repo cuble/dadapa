@@ -23,20 +23,64 @@ class ownInterfaceTest(mtc.myTestCase):
         self.mock_function(f.close).and_return(checkStr)
         self.assertEqual(checkStr, backlogTree.my_close(f))
 
-class backlogTreeTest(mtc.myTestCase):
-    class fileTest:
-        def __init__(self, fileName, fileContent, subTree):
-            self.name = fileName
-            self.content = fileContent
-            self.subTree = subTree
-            
-    file_test_data=[
-('two first level subtree', 
-['sub content 1\n', 
-           'sub content 2\n'],
-[backlogTree.backlogTree('sub content 1'), backlogTree.backlogTree('sub content 2')]),
-()]
+class fileTest:
+    testDataForBlankTreeInit=\
+[
+    ('two first level subTree', 
+        ['sub content 1\n', 
+         'sub content 2\n'],
+        [backlogTree.backlogTree('sub content 1'), backlogTree.backlogTree('sub content 2')]
+    ),
+    ('two first level subTree with blank lines',
+        [' \n',
+         '\t\n',
+         'sub content 1\n',
+         '\t   \t\n',
+         'sub content 2\n'],
+        [backlogTree.backlogTree('sub content 1'), backlogTree.backlogTree('sub content 2')]
+    ),
+    ('two level subTree',
+        ['first level sub content 1\n',
+         '\tfirst level sub content 1: sub item\n'],
+         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
+            [backlogTree.backlogTree('first level sub content 1: sub item')]
+                                 )
+         ]
+    ),
+    ('two first level subTree both with subTree',
+        ['first level sub content 1\n',
+         '  first level sub content 1: sub item\n',
+         'first level sub content 2\n',
+         '  first level sub content 2: sub item\n'],
+         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
+            [backlogTree.backlogTree('first level sub content 1: sub item')]
+                                 ),
+          backlogTree.backlogTree('first level sub content 2', backlogTree.backlogTree.defaultAttr, 
+            [backlogTree.backlogTree('first level sub content 2: sub item')]
+                                 )
+         ]
+    )
+]
+
+    def __init__(self, *testData):
+        self.name = testData[0]
+        self.content = testData[1]
+        self.subTree = testData[2]
     
+    def _do_mock(self, testCase):
+        testCase.mock_function(backlogTree.my_open).with_param(self.name).and_return(self.content)
+        testCase.mock_function(backlogTree.my_close).with_param(self.content)
+        
+    def test_init_blank_node_from_file(self, testCase):
+        defaultAttr = backlogTree.backlogTree.defaultAttr
+        self._do_mock(testCase)
+        bt = backlogTree.backlogTree()
+        bt.init_from_file(self.name)
+        testCase.assertEqual(self.name, bt._content)
+        testCase.assertEqual(bt._attribute, defaultAttr)
+        testCase.assertEqual(bt._subTree, self.subTree)
+            
+class backlogTreeTest(mtc.myTestCase):
     def my_setup(self):
         pass
     
@@ -57,46 +101,25 @@ class backlogTreeTest(mtc.myTestCase):
         attribute = {'priority':2}
         bt = backlogTree.backlogTree(content, attribute)
         self._check_backlog_tree_content(bt, content, attribute, [])
-        
-    def test_init_blank_tree_from_file_root_content_is_file_name(self):
-        fileName = 'a backlog'
-        content = ['sub content 1\n', 'sub content 2\n']
-        defaultAttr = backlogTree.backlogTree.defaultAttr
-        self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
-#        self.mock_function(backlogTree.my_close).with_param(content)
-        bt = backlogTree.backlogTree()
-        bt.init_from_file(fileName)
-        self.assertEqual(fileName, bt._content)
-        self.assertEqual(bt._attribute, defaultAttr)
-        self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1'),
-                                       backlogTree.backlogTree('sub content 2')])
+                
+    def test_init_blank_tree_from_file_other_cases(self):
+        testCaseNum = len(fileTest.testDataForBlankTreeInit)
+        for i in range(testCaseNum):
+            ft = fileTest(*fileTest.testDataForBlankTreeInit[i])
+            ft.test_init_blank_node_from_file(self)
 
-    def test_init_one_node_tree_from_file_file_name_is_ignored(self):
+    def test_init_one_node_tree_from_file_filename_is_ignored(self):
         fileName = 'a backlog'
         content = ['sub content 1\n', 'sub content 2\n']
         self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
-        bt = backlogTree.backlogTree('root node', {'priority':2}, [])
+        self.mock_function(backlogTree.my_close).with_param(content)
+        bt = backlogTree.backlogTree('root node', {'priority':2})
         bt.init_from_file(fileName)
         self.assertEqual('root node', bt._content)
         self.assertEqual({'priority':2}, bt._attribute)
         self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1', {'priority':2}),
                                        backlogTree.backlogTree('sub content 2', {'priority':2})])
         
-    def test_init_muti_level_tree_from_file(self):
-        fileName = '2 level backlog'
-        content = ['sub content 1\n', '  sub content 1: sub 1  \n', '  sub content 1: sub 2\n', 'sub content 2\n']
-        defaultAttr = backlogTree.backlogTree.defaultAttr
-        self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
-        bt = backlogTree.backlogTree()
-        bt.init_from_file(fileName)
-        self.assertEqual(fileName, bt._content)
-        self.assertEqual(bt._attribute, defaultAttr)
-        sub_bt1_sub1 = backlogTree.backlogTree('sub content 1: sub 1')
-        sub_bt1_sub2 = backlogTree.backlogTree('sub content 1: sub 2')
-#        self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1', [sub_bt1_sub1, sub_bt1_sub2]),
-#                                       backlogTree.backlogTree('sub content 2')])
-
-
 if __name__ == '__main__':
     import unittest
     unittest.main()
