@@ -24,8 +24,8 @@ class myInterfaceTest(mtc.myTestCase):
         self.assertEqual(checkStr, backlogTree.my_close(f))
 
 btC=backlogTree.backlogTree
-class fileTest:
-    testDataForBlankTreeInit=\
+class backlogFileTest:
+    testDataList=\
 [
     ('two first level subTree', 
         ['sub content 1\n', 
@@ -43,24 +43,24 @@ class fileTest:
          '  first level sub content 1: sub item\n',
          'first level sub content 2\n',
          '  first level sub content 2: sub item\n'],
-        [btC('first level sub content 1', btC.defaultAttr, 
+        [btC('first level sub content 1', 
            [btC('first level sub content 1: sub item')] ),
-         btC('first level sub content 2', btC.defaultAttr, 
+         btC('first level sub content 2', 
            [btC('first level sub content 2: sub item')] )
         ] ),
-    ('Three level subTree',
+    ('More level subTree',
         ['first level sub content 1\n',
          '  second level sub content 1\n',
          '    third level sub content 1\n'],
-        [btC('first level sub content 1', btC.defaultAttr, 
-           [btC('second level sub content 1', btC.defaultAttr,
+        [btC('first level sub content 1', 
+           [btC('second level sub content 1',
               [btC('third level sub content 1')] )
            ] )
         ] ),
     ('two level subTree with more indent',
         ['first level sub content 1\n',
          '    first level sub content 1: sub item\n'],
-        [btC('first level sub content 1', btC.defaultAttr, 
+        [btC('first level sub content 1',  
            [btC('first level sub content 1: sub item')] )
         ] ),
     ('two level subTree while tab equals to 4 spaces',
@@ -68,22 +68,23 @@ class fileTest:
          '\t\tfirst level sub content 1: sub item 1\n',
          '        first level sub content 1: sub item 2\n',
          '    \tfirst level sub content 1: sub item 3\n'],
-        [btC('first level sub content 1', btC.defaultAttr, 
+        [btC('first level sub content 1',
            [btC('first level sub content 1: sub item 1'),
             btC('first level sub content 1: sub item 2'),
             btC('first level sub content 1: sub item 3')] )
         ] ),
-    ('two level subTree while tab equals to 4 spaces',
-        ['  first level sub content 1\n',
-         '        first level sub content 1: sub item 1\n',
-         '      first level sub content 1: sub item 2\n',
-         '       first level sub content 1: sub item 3\n',
-         'first level sub content 2\n'],
-        [btC('first level sub content 1', btC.defaultAttr, 
-           [btC('first level sub content 1: sub item 1'),
-            btC('first level sub content 1: sub item 2'),
-            btC('first level sub content 1: sub item 3')] ),
-         btC('first level sub content 2')
+    ('More level subTree with not regular indent',
+        ['  sub content 1\n',
+         '        sub content 1.1\n',
+         '      sub content 1.2\n',
+         '       sub content 1.2.1\n',
+         '    sub content 1.3',
+         'sub content 2\n'],
+        [btC('sub content 1',
+           [btC('sub content 1.1'),
+            btC('sub content 1.2', [btC('sub content 1.2.1')]),
+            btC('sub content 1.3')] ),
+         btC('sub content 2')
         ] )
 ]
 
@@ -96,15 +97,14 @@ class fileTest:
         testCase.mock_function(backlogTree.my_open).with_param(self.name).and_return(self.content)
         testCase.mock_function(backlogTree.my_close).with_param(self.content)
         
-    def test_init_blank_node_from_file(self, testCase):
-        defaultAttr = btC.defaultAttr
+    def test_init_from_from_file_base_blank_node(self, testCase):
         self._do_mock(testCase)
         bt = btC()
         bt.init_from_file(self.name)
         testCase.assertEqual(self.name, bt._content)
-        testCase.assertEqual(defaultAttr, bt._attribute)
+        testCase.assertEqual(btC.defaultAttr, bt._attribute)
         testCase.assertEqual(self.subTree, bt._subTree)
-            
+                  
 class backlogTreeTest(mtc.myTestCase):
     def my_setup(self):
         pass
@@ -124,25 +124,27 @@ class backlogTreeTest(mtc.myTestCase):
     def test_create_one_node_tree(self):
         content = 'root node'
         attribute = {'priority':2}
-        bt = btC(content, attribute)
+        bt = btC(content, [], attribute)
         self._check_backlog_tree_content(bt, content, attribute, [])
                 
-    def test_init_blank_tree_from_file(self):
-        testCaseNum = len(fileTest.testDataForBlankTreeInit)
-        for i in range(testCaseNum):
-            ft = fileTest(*fileTest.testDataForBlankTreeInit[i])
-            ft.test_init_blank_node_from_file(self)
+    def test_init_from_file_base_blank_tree(self):
+        for bftData in backlogFileTest.testDataList:
+            bft = backlogFileTest(*bftData)
+            bft.test_init_from_from_file_base_blank_node(self)
 
-    def test_init_one_node_tree_from_file_filename_is_ignored(self):
+    def test_init_from_file_base_inited_node(self):
         fileName = 'a backlog'
         content = ['sub content 1\n']
         self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
         self.mock_function(backlogTree.my_close).with_param(content)
-        bt = btC('root node', {'priority':2})
+        bt = btC('root node', attribute={'priority': 2})
         bt.init_from_file(fileName)
         self.assertEqual('root node', bt._content)
         self.assertEqual({'priority':2}, bt._attribute)
-        self.assertEqual(bt._subTree, [btC('sub content 1', {'priority':2})])
+        self.assertEqual(bt._subTree, [btC('sub content 1', attribute={'priority': 2})])
+        
+    def test_init_from_file_with_attribute(self):
+        self.fail('not implemented')
         
 if __name__ == '__main__':
     import unittest

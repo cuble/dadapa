@@ -6,7 +6,7 @@ def my_close(f):
 
 class backlogTree:
     defaultAttr = {'priority': 1}
-    def __init__(self, content='', attribute=None, subTree=None):
+    def __init__(self, content='', subTree=None, attribute=None):
         self._content = content
         self._attribute = attribute
         if not attribute: self._attribute = backlogTree.defaultAttr
@@ -17,7 +17,7 @@ class backlogTree:
     def _create_sub_node(self, item):
         itemCore = item.strip()
         item = item.replace('\t', ' '*4)
-        btNode = backlogTree(itemCore, self._attribute)
+        btNode = backlogTree(itemCore, [], self._attribute)
         btNode.indent = item.rfind(itemCore)
         curNode = self
         while curNode._subTree and btNode.indent > curNode._subTree[-1].indent:
@@ -30,7 +30,7 @@ class backlogTree:
             self._create_sub_node(item)
         
     def init_from_file(self, fileName):
-        f=my_open(fileName)
+        f = my_open(fileName)
         if not self._content: self._content = fileName
         self._create_sub_tree_from_file(f)
         my_close(f)
