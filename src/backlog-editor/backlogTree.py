@@ -12,13 +12,17 @@ class backlogTree:
         if not attribute: self._attribute = backlogTree.defaultAttr
         self._subTree = subTree
         if not subTree: self._subTree = []
+        self.indent = 0
         
     def _create_sub_node(self, item):
         itemCore = item.strip()
+        item = item.replace('\t', ' '*4)
         btNode = backlogTree(itemCore, self._attribute)
-        if ' ' == item[0] or '\t' == item[0]: 
-            self._subTree[-1]._subTree.append(btNode)
-        else: self._subTree.append(btNode)
+        btNode.indent = item.rfind(itemCore)
+        curNode = self
+        while curNode._subTree and btNode.indent > curNode._subTree[-1].indent:
+            curNode = curNode._subTree[-1]
+        curNode._subTree.append(btNode)
 
     def _create_sub_tree_from_file(self, f):
         for item in f:

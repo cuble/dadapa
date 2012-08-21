@@ -23,55 +23,68 @@ class myInterfaceTest(mtc.myTestCase):
         self.mock_function(f.close).and_return(checkStr)
         self.assertEqual(checkStr, backlogTree.my_close(f))
 
+btC=backlogTree.backlogTree
 class fileTest:
     testDataForBlankTreeInit=\
 [
     ('two first level subTree', 
         ['sub content 1\n', 
          'sub content 2\n'],
-        [backlogTree.backlogTree('sub content 1'), backlogTree.backlogTree('sub content 2')]
-    ),
+        [btC('sub content 1'), btC('sub content 2')] ),
     ('two first level subTree with blank lines',
         [' \n',
          '\t\n',
          'sub content 1\n',
          '\t   \t\n',
          'sub content 2\n'],
-        [backlogTree.backlogTree('sub content 1'), backlogTree.backlogTree('sub content 2')]
-    ),
-    ('two level subTree',
-        ['first level sub content 1\n',
-         '\tfirst level sub content 1: sub item\n'],
-         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
-            [backlogTree.backlogTree('first level sub content 1: sub item')]
-                                 )
-         ]
-    ),
+        [btC('sub content 1'), btC('sub content 2')] ),
     ('two first level subTree both with subTree',
         ['first level sub content 1\n',
          '  first level sub content 1: sub item\n',
          'first level sub content 2\n',
          '  first level sub content 2: sub item\n'],
-         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
-            [backlogTree.backlogTree('first level sub content 1: sub item')]
-                                 ),
-          backlogTree.backlogTree('first level sub content 2', backlogTree.backlogTree.defaultAttr, 
-            [backlogTree.backlogTree('first level sub content 2: sub item')]
-                                 )
-         ]
-    ),
+        [btC('first level sub content 1', btC.defaultAttr, 
+           [btC('first level sub content 1: sub item')] ),
+         btC('first level sub content 2', btC.defaultAttr, 
+           [btC('first level sub content 2: sub item')] )
+        ] ),
     ('Three level subTree',
         ['first level sub content 1\n',
          '  second level sub content 1\n',
          '    third level sub content 1\n'],
-         [backlogTree.backlogTree('first level sub content 1', backlogTree.backlogTree.defaultAttr, 
-            [backlogTree.backlogTree('second level sub content 1', backlogTree.backlogTree.defaultAttr,
-                [backlogTree.backlogTree('third level sub content 1')]
-                                    )
-            ]
-                                 )
-         ]
-    )
+        [btC('first level sub content 1', btC.defaultAttr, 
+           [btC('second level sub content 1', btC.defaultAttr,
+              [btC('third level sub content 1')] )
+           ] )
+        ] ),
+    ('two level subTree with more indent',
+        ['first level sub content 1\n',
+         '    first level sub content 1: sub item\n'],
+        [btC('first level sub content 1', btC.defaultAttr, 
+           [btC('first level sub content 1: sub item')] )
+        ] ),
+    ('two level subTree while tab equals to 4 spaces',
+        ['first level sub content 1\n',
+         '\t\tfirst level sub content 1: sub item 1\n',
+         '        first level sub content 1: sub item 2\n',
+         '    \tfirst level sub content 1: sub item 3\n'],
+        [btC('first level sub content 1', btC.defaultAttr, 
+           [btC('first level sub content 1: sub item 1'),
+            btC('first level sub content 1: sub item 2'),
+            btC('first level sub content 1: sub item 3')] )
+        ] ),
+    ('two level subTree while tab equals to 4 spaces',
+        ['  first level sub content 1\n',
+         '        first level sub content 1: sub item 1\n',
+         '      first level sub content 1: sub item 2\n',
+         '       first level sub content 1: sub item 3\n',
+         'first level sub content 2\n'],
+        [btC('first level sub content 1', btC.defaultAttr, 
+           [btC('first level sub content 1: sub item 1'),
+            btC('first level sub content 1: sub item 2'),
+            btC('first level sub content 1: sub item 3')] ),
+         btC('first level sub content 2')
+        ] )
 ]
 
     def __init__(self, *testData):
@@ -84,9 +97,9 @@ class fileTest:
         testCase.mock_function(backlogTree.my_close).with_param(self.content)
         
     def test_init_blank_node_from_file(self, testCase):
-        defaultAttr = backlogTree.backlogTree.defaultAttr
+        defaultAttr = btC.defaultAttr
         self._do_mock(testCase)
-        bt = backlogTree.backlogTree()
+        bt = btC()
         bt.init_from_file(self.name)
         testCase.assertEqual(self.name, bt._content)
         testCase.assertEqual(defaultAttr, bt._attribute)
@@ -105,13 +118,13 @@ class backlogTreeTest(mtc.myTestCase):
         self.assertEqual(bt._subTree, subTree)
 
     def test_create_blank_tree(self):
-        bt = backlogTree.backlogTree()
-        self._check_backlog_tree_content(bt, '', backlogTree.backlogTree.defaultAttr, [])
+        bt = btC()
+        self._check_backlog_tree_content(bt, '', btC.defaultAttr, [])
         
     def test_create_one_node_tree(self):
         content = 'root node'
         attribute = {'priority':2}
-        bt = backlogTree.backlogTree(content, attribute)
+        bt = btC(content, attribute)
         self._check_backlog_tree_content(bt, content, attribute, [])
                 
     def test_init_blank_tree_from_file(self):
@@ -125,11 +138,11 @@ class backlogTreeTest(mtc.myTestCase):
         content = ['sub content 1\n']
         self.mock_function(backlogTree.my_open).with_param(fileName).and_return(content)
         self.mock_function(backlogTree.my_close).with_param(content)
-        bt = backlogTree.backlogTree('root node', {'priority':2})
+        bt = btC('root node', {'priority':2})
         bt.init_from_file(fileName)
         self.assertEqual('root node', bt._content)
         self.assertEqual({'priority':2}, bt._attribute)
-        self.assertEqual(bt._subTree, [backlogTree.backlogTree('sub content 1', {'priority':2})])
+        self.assertEqual(bt._subTree, [btC('sub content 1', {'priority':2})])
         
 if __name__ == '__main__':
     import unittest
