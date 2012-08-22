@@ -43,65 +43,84 @@ btC=backlogTree.backlogTree
 class backlogFileTest:
     testDataList=\
 [
-    ('two first level subTree', 
-        ['sub content 1\n', 
-         'sub content 2\n'],
-        [btC('sub content 1'), btC('sub content 2')] ),
-    ('two first level subTree with blank lines',
-        [' \n',
-         '\t\n',
-         'sub content 1\n',
-         '\t   \t\n',
-         'sub content 2\n'],
-        [btC('sub content 1'), btC('sub content 2')] ),
-    ('two first level subTree both with subTree',
-        ['first level sub content 1\n',
-         '  first level sub content 1: sub item\n',
-         'first level sub content 2\n',
-         '  first level sub content 2: sub item\n'],
-        [btC('first level sub content 1', 
-           [btC('first level sub content 1: sub item')] ),
-         btC('first level sub content 2', 
-           [btC('first level sub content 2: sub item')] )
-        ] ),
-    ('More level subTree',
-        ['first level sub content 1\n',
-         '  second level sub content 1\n',
-         '    third level sub content 1\n'],
-        [btC('first level sub content 1', 
-           [btC('second level sub content 1',
-              [btC('third level sub content 1')] )
-           ] )
-        ] ),
-    ('two level subTree with more indent',
-        ['first level sub content 1\n',
-         '    first level sub content 1: sub item\n'],
-        [btC('first level sub content 1',  
-           [btC('first level sub content 1: sub item')] )
-        ] ),
-    ('two level subTree while tab equals to 4 spaces',
-        ['first level sub content 1\n',
-         '\t\tfirst level sub content 1: sub item 1\n',
-         '        first level sub content 1: sub item 2\n',
-         '    \tfirst level sub content 1: sub item 3\n'],
-        [btC('first level sub content 1',
-           [btC('first level sub content 1: sub item 1'),
-            btC('first level sub content 1: sub item 2'),
-            btC('first level sub content 1: sub item 3')] )
-        ] ),
-    ('More level subTree with not regular indent',
-        ['  sub content 1\n',
-         '        sub content 1.1\n',
-         '      sub content 1.2\n',
-         '       sub content 1.2.1\n',
-         '    sub content 1.3',
-         'sub content 2\n'],
-        [btC('sub content 1',
-           [btC('sub content 1.1'),
-            btC('sub content 1.2', [btC('sub content 1.2.1')]),
-            btC('sub content 1.3')] ),
-         btC('sub content 2')
-        ] )
+('two first level subTree', 
+    ['sub content 1\n', 
+     'sub content 2\n'],
+    [btC('sub content 1'), btC('sub content 2')] ),
+('two first level subTree with blank lines',
+    [' \n',
+     '\t\n',
+     'sub content 1\n',
+     '\t   \t\n',
+     'sub content 2\n'],
+    [btC('sub content 1'), btC('sub content 2')] ),
+('two first level subTree both with subTree',
+    ['first level sub content 1\n',
+     '  first level sub content 1: sub item\n',
+     'first level sub content 2\n',
+     '  first level sub content 2: sub item\n'],
+    [btC('first level sub content 1', 
+       [btC('first level sub content 1: sub item')] ),
+     btC('first level sub content 2', 
+       [btC('first level sub content 2: sub item')] )
+    ] ),
+('More level subTree',
+    ['first level sub content 1\n',
+     '  second level sub content 1\n',
+     '    third level sub content 1\n'],
+    [btC('first level sub content 1', 
+       [btC('second level sub content 1',
+          [btC('third level sub content 1')] )
+       ] )
+    ] ),
+('two level subTree with more indent',
+    ['first level sub content 1\n',
+     '    first level sub content 1: sub item\n'],
+    [btC('first level sub content 1',  
+       [btC('first level sub content 1: sub item')] )
+    ] ),
+('two level subTree while tab equals to 4 spaces',
+    ['first level sub content 1\n',
+     '\t\tfirst level sub content 1: sub item 1\n',
+     '        first level sub content 1: sub item 2\n',
+     '    \tfirst level sub content 1: sub item 3\n'],
+    [btC('first level sub content 1',
+       [btC('first level sub content 1: sub item 1'),
+        btC('first level sub content 1: sub item 2'),
+        btC('first level sub content 1: sub item 3')] )
+    ] ),
+('More level subTree with not regular indent',
+    ['  sub content 1\n',
+     '        sub content 1.1\n',
+     '      sub content 1.2\n',
+     '       sub content 1.2.1\n',
+     '    sub content 1.3',
+     'sub content 2\n'],
+    [btC('sub content 1',
+       [btC('sub content 1.1'),
+        btC('sub content 1.2', [btC('sub content 1.2.1')]),
+        btC('sub content 1.3')] ),
+     btC('sub content 2')
+    ] )
+]
+
+    testDataWithAttr = \
+[
+('two first level nodes',
+    ['sub content 1\n',
+     '{"attribute":"value"}\n',
+     'sub content 2\n',
+     '{"attribute":"value"}\n'],
+    [btC('sub content 1', attribute={'attribute':'value'}),
+     btC('sub content 2', attribute={'attribute':'value'})] ),
+('two level nodes',
+    ['sub content 1\n',
+     '{"attribute":"value"}\n',
+     '  sub content 1.2\n',
+     '  {"attribute":"sub value"}\n'],
+    [btC('sub content 1', 
+         [btC('sub content 1.2', attribute={'attribute':'sub value'})], 
+         {'attribute':'value'})] )
 ]
 
     def __init__(self, *testData):
@@ -160,7 +179,9 @@ class backlogTreeTest(mtc.myTestCase):
         self.assertEqual(bt._subTree, [btC('sub content 1', attribute={'priority': 2})])
         
     def test_init_from_file_with_attribute(self):
-        self.fail('not implemented')
+        for bftData in backlogFileTest.testDataWithAttr:
+            bft = backlogFileTest(*bftData)
+            bft.test_init_from_from_file_base_blank_node(self)
         
 if __name__ == '__main__':
     import unittest
