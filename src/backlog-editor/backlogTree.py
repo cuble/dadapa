@@ -14,11 +14,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-def my_open(path, flag='r'):
+def my_open(path, flag='rb'):
     return open(path, flag)
 
 def my_close(f):
     return f.close()
+
+def my_write(f, content):
+    f.write(content)
 
 class backlogTree:
     defaultAttr = {'priority': 1}
@@ -54,7 +57,14 @@ class backlogTree:
         if not self._content: self._content = fileName
         self._create_sub_tree_from_file(f)
         my_close(f)
-            
+
+    def save(self, fileName):
+        f = my_open(fileName, 'wb')
+        if self._content:
+            content = self.__str__()
+            my_write(f, content)
+        my_close(f)
+    
     def __eq__(self, other):
         if self._content != other._content: return False
         if self._attribute != other._attribute: return False
@@ -65,15 +75,26 @@ class backlogTree:
 #        return not self.__eq__(other)
     
     #for checking test result convinient
-    def __to_str(self, indent):
+    def __to_repr(self, indent):
         indentStr = ' '*indent
         repStr = indentStr + repr(self._content)+'\n'
         repStr += indentStr + repr(self._attribute) + '\n'
-        repStr += indentStr + '[\n'
+        for subTree in self._subTree:
+            repStr += subTree.__to_repr(indent+4) 
+        return repStr 
+    
+    def __to_str(self, indent):
+        indentStr = ' '*indent
+        repStr = indentStr + str(self._content)+'\n'
+        repStr += indentStr + str(self._attribute) + '\n'
+
         for subTree in self._subTree:
             repStr += subTree.__to_str(indent+4) 
-        repStr += indentStr + ']\n' 
+
         return repStr 
+    
+    def __str__(self):
+        return self.__to_str(0)
         
     def __repr__(self):
-        return self.__to_str(0)
+        return self.__to_repr(0)

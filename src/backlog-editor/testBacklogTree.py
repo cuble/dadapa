@@ -21,6 +21,9 @@ class testFile:
     def close(self):
         pass
 
+    def write(self):
+        pass
+
 class myInterfaceTest(mtc.myTestCase):
     def test_my_open_is_wrap_to_open(self):
         fileName = 'another file'
@@ -30,14 +33,20 @@ class myInterfaceTest(mtc.myTestCase):
         self.assertEqual(content, backlogTree.my_open(fileName, flag))
 
     def test_my_open_is_wrap_to_open_with_default_flag_r(self):
-        self.mock_function(open).with_param('another file', 'r').and_return([])
+        self.mock_function(open).with_param('another file', 'rb').and_return([])
         self.assertEqual([], backlogTree.my_open('another file'))
 
-    def test_my_close_is_wrap_to_close(self):
+    def test_my_close_is_wrap_to_file_close(self):
         checkStr = 'for checking only'
         f = testFile()
         self.mock_function(f.close).and_return(checkStr)
         self.assertEqual(checkStr, backlogTree.my_close(f))
+        
+    def test_my_write_is_wrap_to_file_write(self):
+        testStr = 'for checking only'
+        f = testFile()
+        self.mock_function(f.write).with_param(testStr)
+        backlogTree.my_write(f, testStr)
 
 btC=backlogTree.backlogTree
 class backlogFileTest:
@@ -118,7 +127,7 @@ class backlogFileTest:
      '{"attribute":"value"}\n',
      '  sub content 1.2\n',
      '  {"attribute":"sub value"}\n'],
-    [btC('sub content 1', 
+    [btC('sub content 1',
          [btC('sub content 1.2', attribute={'attribute':'sub value'})], 
          {'attribute':'value'})] )
 ]
@@ -139,7 +148,10 @@ class backlogFileTest:
         testCase.assertEqual(self.name, bt._content)
         testCase.assertEqual(btC.defaultAttr, bt._attribute)
         testCase.assertEqual(self.subTree, bt._subTree)
-                  
+            
+def write_stub(f, content):
+    f.append(content)
+      
 class backlogTreeTest(mtc.myTestCase):
     def my_setup(self):
         pass
@@ -182,7 +194,28 @@ class backlogTreeTest(mtc.myTestCase):
         for bftData in backlogFileTest.testDataWithAttr:
             bft = backlogFileTest(*bftData)
             bft.test_init_from_from_file_base_blank_node(self)
+                
+    def test_save_blank_node_to_file(self):
+        fileName = 'a project'
+        content = []
+        bt = btC()
+        self.mock_function(backlogTree.my_open).with_param(fileName, 'wb').and_return(content)
+        self.mock_function(backlogTree.my_close).with_param(content)
+        self.stub_out(backlogTree.my_write, write_stub)
+        bt.save(fileName)
+        self.assertEqual(content, [])
         
+    def test_save_one_node_to_file(self):
+        fileName = 'another project'
+        content = []
+        bt = btC('root node')
+        self.mock_function(backlogTree.my_open).with_param(fileName, 'wb').and_return(content)
+        self.mock_function(bt.__str__).and_return('backlogTree represent')
+        self.mock_function(backlogTree.my_close).with_param(content)
+        self.stub_out(backlogTree.my_write, write_stub)
+        bt.save(fileName)
+        self.assertEqual(['backlogTree represent'], content)
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
