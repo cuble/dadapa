@@ -17,3 +17,34 @@ As a user, I want to undo my changes so that I can recover my wrong operation qu
 As a implementer, I want to attach outcome to the item so that I can trace our progress from the backlog-editor
 As an implementer, I want to add sub-items to the item so that it can reflect our understanding to the task more structured.
 
+----------------------------------------------------------------------------
+To be studied items: 
+1. RichTextCtrl
+2. TreeMixin,TreeCtrl
+3. Cairo_Snippets
+4. AquaButton
+5. AUI
+6. Clipboard and Dnd: DragAndDrop, URLDragAndDrop, CustomDragAndDrop
+7. KeyEvents
+8. Process
+9. PythonEvents
+10. Threads
+11. Timer
+12. DelayedResult
+13. EventManager
+14. CollapsiblePane
+15. ContextHelp
+16. MVCTree
+17. pyCrust, pyShell(wx.py)
+18. styledTextCtrl
+19. CustomTreeCtrl
+20. FlatMenu
+21. GenericMessageDialog
+22. HyperLinkCtrl
+23. Editor
+24. PopupMenu
+25. SearchCtrl
+26. StatusBar
+27. PyCollapsiblePane
+
+

@@ -70,11 +70,7 @@ class backlogTree:
         if self._attribute != other._attribute: return False
         if self._subTree != other._subTree: return False
         return True
-    
-#    def __ne__(self, other):
-#        return not self.__eq__(other)
-    
-    #for checking test result convinient
+
     def __to_repr(self, indent):
         indentStr = ' '*indent
         repStr = indentStr + repr(self._content)+'\n'
