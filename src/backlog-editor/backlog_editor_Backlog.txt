@@ -20,31 +20,35 @@ As an implementer, I want to add sub-items to the item so that it can reflect ou
 ----------------------------------------------------------------------------
 To be studied items: 
 1. RichTextCtrl
-2. TreeMixin,TreeCtrl
-3. Cairo_Snippets
-4. AquaButton
-5. AUI
-6. Clipboard and Dnd: DragAndDrop, URLDragAndDrop, CustomDragAndDrop
+2. TreeMixin, TreeCtrl   ---done
+3. Cairo_Snippets        ---done
+4. AquaButton            ---done
+5. AUI       ---give up
+6. Clipboard and Dnd: 
+    DragAndDrop, URLDragAndDrop      ---done
+    CustomDragAndDrop
 7. KeyEvents
 8. Process
 9. PythonEvents
 10. Threads
-11. Timer
+11. Timer     ---done
 12. DelayedResult
 13. EventManager
-14. CollapsiblePane
+14. CollapsiblePane   ---done
 15. ContextHelp
 16. MVCTree
 17. pyCrust, pyShell(wx.py)
 18. styledTextCtrl
 19. CustomTreeCtrl
 20. FlatMenu
-21. GenericMessageDialog
+21. GenericMessageDialog        ----Done
 22. HyperLinkCtrl
 23. Editor
-24. PopupMenu
-25. SearchCtrl
-26. StatusBar
-27. PyCollapsiblePane
-28. Window Layout/SizedControls
+24. PopupMenu, PopupControl, PopupWindow
+25. SearchCtrl    ----done
+26. StatusBar    ----done
+27. PyCollapsiblePane      ---done
+28. Window Layout/SizedControls    ---done
+
+Basic: wx.Font, wx.***Sizer£¬ EVT_CONTEXT_MENU
 

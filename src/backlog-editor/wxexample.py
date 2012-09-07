@@ -18,6 +18,13 @@
 import os
 import wx
 from wx.lib.wordwrap import wordwrap
+import wx.TreeCtrl
+import wx.lib.mvctree
+import wx.lib.mixins.VirtualTree
+import wx.Treebook
+import wx.Panel
+
+
 
 class myPanel(wx.Panel):
     def __init__(self, parent):
