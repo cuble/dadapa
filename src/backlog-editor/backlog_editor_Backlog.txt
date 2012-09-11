@@ -26,7 +26,7 @@ To be studied items:
 5. AUI       ---give up
 6. Clipboard and Dnd: 
     DragAndDrop, URLDragAndDrop      ---done
-    CustomDragAndDrop
+    CustomDragAndDrop                ---Done
 7. KeyEvents
 8. Process
 9. PythonEvents
@@ -40,15 +40,16 @@ To be studied items:
 17. pyCrust, pyShell(wx.py)
 18. styledTextCtrl
 19. CustomTreeCtrl
-20. FlatMenu
+20. Menu     ---Done
 21. GenericMessageDialog        ----Done
 22. HyperLinkCtrl
 23. Editor
-24. PopupMenu, PopupControl, PopupWindow
+24. PopupMenu, PopupControl, PopupWindow    ----Done
 25. SearchCtrl    ----done
 26. StatusBar    ----done
 27. PyCollapsiblePane      ---done
 28. Window Layout/SizedControls    ---done
-
-Basic: wx.Font, wx.***Sizer£¬ EVT_CONTEXT_MENU
+29. FlatMenu    
+Basic: wx.Font, wx.***Sizer£¬ wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL
+DC draw: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject
 
