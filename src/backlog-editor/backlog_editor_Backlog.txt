@@ -27,29 +27,32 @@ To be studied items:
 6. Clipboard and Dnd: 
     DragAndDrop, URLDragAndDrop      ---done
     CustomDragAndDrop                ---Done
-7. KeyEvents
+7. KeyEvents            ---Done
 8. Process
 9. PythonEvents
 10. Threads
-11. Timer     ---done
-12. DelayedResult
+11. Timer               ---done
+12. DelayedResult       ---Done
 13. EventManager
-14. CollapsiblePane   ---done
+14. CollapsiblePane     ---done
 15. ContextHelp
 16. MVCTree
 17. pyCrust, pyShell(wx.py)
 18. styledTextCtrl
 19. CustomTreeCtrl
-20. Menu     ---Done
+20. Menu                        ---Done
 21. GenericMessageDialog        ----Done
-22. HyperLinkCtrl
+22. HyperLinkCtrl               ----Done
 23. Editor                      ----Done
 24. PopupMenu, PopupControl, PopupWindow    ----Done
-25. SearchCtrl    ----done
-26. StatusBar    ----done
-27. PyCollapsiblePane      ---done
-28. Window Layout/SizedControls    ---done
+25. SearchCtrl                  ----done
+26. StatusBar                   ----done
+27. PyCollapsiblePane           ---done
+28. Window Layout/SizedControls ---done
 29. FlatMenu    
-Basic: wx.Font, wx.***Sizer, wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL
-DC draw&Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject
+Basic: wx.Font, wx.***Sizer, wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL, wx.Panel.PopupMenu
+DC draw&Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject, wx.PaintDC, wx.Window.GetClientRect
+key event: wx.TheClipboard(Open, Close, SetData), wx.Event.Skip, wx.EVT_KEY_UP, wx.EVT_KEY_DOWN, wx.EVT_CHAR, wx.Window.SetFocus, wx.Frame.SetExtraStyle(wx.WS_EX_BLOCK_EVENTS)
+Thread: wx.lib.delayedresult.startWorker(...)
+
 
