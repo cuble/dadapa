@@ -43,13 +43,13 @@ To be studied items:
 20. Menu     ---Done
 21. GenericMessageDialog        ----Done
 22. HyperLinkCtrl
-23. Editor
+23. Editor                      ----Done
 24. PopupMenu, PopupControl, PopupWindow    ----Done
 25. SearchCtrl    ----done
 26. StatusBar    ----done
 27. PyCollapsiblePane      ---done
 28. Window Layout/SizedControls    ---done
 29. FlatMenu    
-Basic: wx.Font, wx.***Sizer£¬ wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL
-DC draw: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject
+Basic: wx.Font, wx.***Sizer, wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL
+DC draw&Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject
 
