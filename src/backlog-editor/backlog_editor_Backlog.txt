@@ -28,9 +28,9 @@ To be studied items:
     DragAndDrop, URLDragAndDrop      ---done
     CustomDragAndDrop                ---Done
 7. KeyEvents            ---Done
-8. Process
+8. Process              ---done
 9. PythonEvents         ---Done
-10. Threads
+10. Threads             ---done
 11. Timer               ---done
 12. DelayedResult       ---Done
 13. EventManager        ---done
