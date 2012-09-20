@@ -49,11 +49,14 @@ To be studied items:
 26. StatusBar                   ----done
 27. PyCollapsiblePane           ---done
 28. Window Layout/SizedControls ---done
-29. FlatMenu    
+29. FlatMenu                    ---done
 Basic: wx.Font, wx.***Sizer, wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL, wx.Panel.PopupMenu
-DC draw&Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject, wx.PaintDC, wx.Window.GetClientRect
+Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject, 
 key event: wx.TheClipboard(Open, Close, SetData), wx.Event.Skip, wx.EVT_KEY_UP, wx.EVT_KEY_DOWN, wx.EVT_CHAR, wx.Window.SetFocus, wx.Frame.SetExtraStyle(wx.WS_EX_BLOCK_EVENTS), wx.lib.evtmgr.eventManager.Register, wx.lib.newevent.NewEvent
 Thread: thread.start_new_thread, wx.PostEvent, wx.lib.delayedresult.startWorker(...), wx.Process, wx.Execute, ex.Process.Redirect, EVT_END_PROCESS, wx.Process.GetInputSteam
 Window: wx.Window.GetTextExtent, wx.BufferedPaintDC(wx.Window)
+DC Draw: wx.PaintDC, wx.Window.GetClientRect, wx.Pen, wx.Brush, dc.SetPen, dc.SetBrush, dc.DrawRoundedRectangle, dc.DrawRectangleRect
+statusBar: wx.Frame.CreateStatusBar, statusBar.SetStatusWidths, statusBar.SetStatusText
+Menu: wx.lib.agw.flatmenu.FlatMenuBar, FM.FlatMenu, FM.FlatMenuItem, flatMenuBar.AddTool, flatMenuBar.AddControl, flatMenuBar.AddSeparator, flatMenuBar.AddRadioTool
 
 
