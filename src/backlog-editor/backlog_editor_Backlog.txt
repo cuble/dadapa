@@ -38,7 +38,7 @@ To be studied items:
 15. ContextHelp         ---done
 16. MVCTree
 17. pyCrust, pyShell(wx.py)
-18. styledTextCtrl
+18. styledTextCtrl              ---Done
 19. CustomTreeCtrl
 20. Menu                        ---Done
 21. GenericMessageDialog        ----Done
@@ -51,12 +51,15 @@ To be studied items:
 28. Window Layout/SizedControls ---done
 29. FlatMenu                    ---done
 Basic: wx.Font, wx.***Sizer, wx.EVT_CONTEXT_MENU, win.Position, wx.ITEM_RADIO, wx.ITEM_CHECK, wx.ITEM_NORMAL, wx.Panel.PopupMenu
-Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject, 
-key event: wx.TheClipboard(Open, Close, SetData), wx.Event.Skip, wx.EVT_KEY_UP, wx.EVT_KEY_DOWN, wx.EVT_CHAR, wx.Window.SetFocus, wx.Frame.SetExtraStyle(wx.WS_EX_BLOCK_EVENTS), wx.lib.evtmgr.eventManager.Register, wx.lib.newevent.NewEvent
+Drag Drop: cPickle, wx.DropSource, DropSource.SetData, DropSource.DoDragDrop, wx.pyDropTarget, pyDropTarget.SetDataObject, pyDropTarget.GetData, wx.CustomDataObject, evt.GetPosition, 
+key event: wx.TheClipboard(Open, Close, SetData, Flush), wx.Event.Skip, wx.EVT_KEY_UP, wx.EVT_KEY_DOWN, wx.EVT_CHAR, wx.Window.SetFocus, wx.Frame.SetExtraStyle(wx.WS_EX_BLOCK_EVENTS), wx.lib.evtmgr.eventManager.Register, wx.lib.newevent.NewEvent
 Thread: thread.start_new_thread, wx.PostEvent, wx.lib.delayedresult.startWorker(...), wx.Process, wx.Execute, ex.Process.Redirect, EVT_END_PROCESS, wx.Process.GetInputSteam
 Window: wx.Window.GetTextExtent, wx.BufferedPaintDC(wx.Window)
 DC Draw: wx.PaintDC, wx.Window.GetClientRect, wx.Pen, wx.Brush, dc.SetPen, dc.SetBrush, dc.DrawRoundedRectangle, dc.DrawRectangleRect
 statusBar: wx.Frame.CreateStatusBar, statusBar.SetStatusWidths, statusBar.SetStatusText
 Menu: wx.lib.agw.flatmenu.FlatMenuBar, FM.FlatMenu, FM.FlatMenuItem, flatMenuBar.AddTool, flatMenuBar.AddControl, flatMenuBar.AddSeparator, flatMenuBar.AddRadioTool
-
+styledTextCtrl: wx.stc.StyledTextCtrl,  EVT_STC_DO_DROP, EVT_STC_DRAG_OVER, EVT_STC_START_DRAG(evt.SetDragText, evt.SetDragAllowMove, evt.SetDrageResult), EVT_STC_MODIFIED, ed.EmptyUndoBuffer, ed.StyleSetSpec, ed.StartStyling, ed.setStyling, ed.SetMarginType, stc.STC_MARGIN_xxx, ed.SetMarginWidth, ed.MarkerDefine, ed.MarkerAdd, stc.STC_MARK_xxxx, ed.IndicatorSetStyle, ed.IndicatorSetForeground, stc.STC_INDIC_xxxx 
+    Note: style the texts need some time, access the styling text is dangerous!!!
+styledTextCtrl2: ed.CmdKeyAssign, ed.SetLexer, stc.STC_LEX_PYTHON, keyword.kwlist, ed.SetKeyWords, ed.SetProperty, ed.SetMargins, ed.SetViewWhiteSpace, ed.SetEdgeMode, ed.SetEdgeColumn, ed.SetMarginSensitive, stc.STC_MARKNUM_xxx, stc.EVT_STC_UPDATEUI, stc.EVT_STC_MARGINCLICK, ed.RegisterImage, ed.GetCharAt, ed.GetStyleAt, ed.BraceMatch, ed.BraceBadLight, ed.BraceHighlight, ed.GetLineCount, ed.GetFoldLevel, ed.HideLines, ed.ShowLines, ed.SetFoldExpanded,
+wx Events: wx.EVT_WINDOW_DESTROY, wx.EVT_BUTTON,
 
