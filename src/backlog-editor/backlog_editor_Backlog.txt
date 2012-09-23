@@ -19,7 +19,7 @@ As an implementer, I want to add sub-items to the item so that it can reflect ou
 
 ----------------------------------------------------------------------------
 To be studied items: 
-1. RichTextCtrl
+1. RichTextCtrl          ---done
 2. TreeMixin, TreeCtrl   ---done
 3. Cairo_Snippets        ---done
 4. AquaButton            ---done
@@ -36,10 +36,10 @@ To be studied items:
 13. EventManager        ---done
 14. CollapsiblePane     ---done
 15. ContextHelp         ---done
-16. MVCTree
-17. pyCrust, pyShell(wx.py)
+16. MVCTree             ---Ignore
+17. pyCrust, pyShell(wx.py)     ---Ignore
 18. styledTextCtrl              ---Done
-19. CustomTreeCtrl
+19. CustomTreeCtrl              --
 20. Menu                        ---Done
 21. GenericMessageDialog        ----Done
 22. HyperLinkCtrl               ----Done
