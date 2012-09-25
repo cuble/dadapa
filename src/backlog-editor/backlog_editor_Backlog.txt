@@ -39,7 +39,7 @@ To be studied items:
 16. MVCTree             ---Ignore
 17. pyCrust, pyShell(wx.py)     ---Ignore
 18. styledTextCtrl              ---Done
-19. CustomTreeCtrl              --
+19. CustomTreeCtrl              ---Done
 20. Menu                        ---Done
 21. GenericMessageDialog        ----Done
 22. HyperLinkCtrl               ----Done
@@ -63,3 +63,4 @@ styledTextCtrl: wx.stc.StyledTextCtrl,  EVT_STC_DO_DROP, EVT_STC_DRAG_OVER, EVT_
 styledTextCtrl2: ed.CmdKeyAssign, ed.SetLexer, stc.STC_LEX_PYTHON, keyword.kwlist, ed.SetKeyWords, ed.SetProperty, ed.SetMargins, ed.SetViewWhiteSpace, ed.SetEdgeMode, ed.SetEdgeColumn, ed.SetMarginSensitive, stc.STC_MARKNUM_xxx, stc.EVT_STC_UPDATEUI, stc.EVT_STC_MARGINCLICK, ed.RegisterImage, ed.GetCharAt, ed.GetStyleAt, ed.BraceMatch, ed.BraceBadLight, ed.BraceHighlight, ed.GetLineCount, ed.GetFoldLevel, ed.HideLines, ed.ShowLines, ed.SetFoldExpanded,
 wx Events: wx.EVT_WINDOW_DESTROY, wx.EVT_BUTTON,
 
+others: wx.lib.colourselect, wx.WXK_xxxx, wx.StaticBitmap, wx.EmptyBitmap, wx.EVT_COMBOBOX.GetSelection, wx.FONTWEIGHT_BOLD, wx.StaticBoxSizer, wx.Dialog.ShowModal, wx.EVT_LEFT_DCLICK.GetPosition
