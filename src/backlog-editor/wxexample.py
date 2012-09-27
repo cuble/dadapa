@@ -17,13 +17,7 @@
 
 import os
 import wx
-from wx.lib.wordwrap import wordwrap
-import wx.TreeCtrl
-import wx.lib.mvctree
-import wx.lib.mixins.VirtualTree
-import wx.Treebook
-import wx.Panel
-
+import wx.stc as stc
 
 
 class myPanel(wx.Panel):
@@ -48,6 +42,61 @@ class myPanel(wx.Panel):
     def onCheckBox(self, event):
         self.Parent.onCheckBox(self.checkBox.GetValue())
 
+class myStc(stc.StyledTextCtrl):
+    def __init__(self, parent, size=(600,400)):
+        stc.StyledTextCtrl.__init__(self, parent, size=size)
+        self.SetCaretLineVisible(True)        
+
+        self.mode = 'View'
+        
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down, self)
+        self.show_work_mode()
+
+    def show_work_mode(self):
+        parent = self.GetParent()
+        parent.statusBar.SetStatusText("Current work mode is: " + self.mode)
+
+    def work_in_view_mode(self, evt):
+        keyCode = evt.GetKeyCode()
+        if keyCode == wx.WXK_SPACE: 
+            self.mode = 'Edit'
+        if keyCode in (wx.WXK_UP, wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT):
+            evt.Skip()
+        self.show_work_mode()
+        
+    def move_in_edit_mode(self, evt):
+        key = evt.GetKeyCode()
+        if key == wx.WXK_UP: pass
+        elif key == wx.WXK_DOWN: self.LineEnd()
+        else:
+            curLine, curPos = self.GetCurLine()
+            if curPos == 0 and key == wx.WXK_LEFT: pass
+            elif curPos == len(curLine)-1 and key == wx.WXK_RIGHT: pass
+            else: evt.Skip()
+        
+    
+    def work_in_edit_mode(self, evt):
+        keyCode = evt.GetKeyCode()
+        if keyCode in (wx.WXK_RETURN, wx.WXK_ESCAPE):
+            if keyCode == wx.WXK_RETURN: self.LineEnd()
+            self.mode = 'View'
+        
+        if keyCode in (wx.WXK_UP, wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT):
+            self.move_in_edit_mode(evt)
+        else:
+            evt.Skip()
+        self.show_work_mode()
+
+    def on_key_down(self, evt):
+        if self.mode == 'View':
+            self.work_in_view_mode(evt)
+        else:
+            self.work_in_edit_mode(evt)
+            
+    def AddText(self, text):
+        if self.mode == 'View': return
+        else: super(myStc, self).AddText(text)
+
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(800,600))
@@ -57,11 +106,12 @@ class myFrame(wx.Frame):
             self.ico = wx.Icon('wxpdemo.ico', wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.ico)
         vSizer = wx.BoxSizer(wx.VERTICAL)
+        self.statusBar = self.CreateStatusBar()
         self.panel = myPanel(self)
         vSizer.Add(self.panel,0,wx.EXPAND)
-        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(600,600))
+        self.control = myStc(self)
         vSizer.Add(self.control,1, wx.EXPAND)
-        self.CreateStatusBar()
+
         
         filemenu = wx.Menu()
 
@@ -130,11 +180,11 @@ class myFrame(wx.Frame):
         f.close()
         
     def onClear(self):
-        self.control.SetValue("")
+        self.control.ClearAll()
         
     def onCheckBox(self, isChecked):
-        if isChecked: self.control.AppendText("The checkBox Checked\n")
-        else: self.control.AppendText("The checkBox Unchecked\n")
+        if isChecked: self.control.AddText("The checkBox Checked\n")
+        else: self.control.AddText("The checkBox Unchecked\n")
 
 if __name__=='__main__':
     app = wx.App(False)
