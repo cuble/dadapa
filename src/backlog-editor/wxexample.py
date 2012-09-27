@@ -42,9 +42,17 @@ class myPanel(wx.Panel):
     def onCheckBox(self, event):
         self.Parent.onCheckBox(self.checkBox.GetValue())
 
+class myStcConfiguration:
+    def __init__(self):
+        self.activeItemBackground = wx.LIGHT_GREY
+        self.tabIndentLen = 4
+
 class myStc(stc.StyledTextCtrl):
-    def __init__(self, parent, size=(600,400)):
+    def __init__(self, parent, config, size=(600,400)):
         stc.StyledTextCtrl.__init__(self, parent, size=size)
+        self.config = config
+        self.SetCaretLineBackground(self.config.activeItemBackground)
+        #self.SetCaretLineBackAlpha(80)
         self.SetCaretLineVisible(True)        
 
         self.mode = 'View'
@@ -58,30 +66,44 @@ class myStc(stc.StyledTextCtrl):
 
     def work_in_view_mode(self, evt):
         keyCode = evt.GetKeyCode()
-        if keyCode == wx.WXK_SPACE: 
+        if keyCode in (wx.WXK_SPACE, wx.WXK_INSERT): 
             self.mode = 'Edit'
+            if keyCode == wx.WXK_INSERT:
+                self.LineEnd()
+                self.AddText('\n')
         if keyCode in (wx.WXK_UP, wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT):
             evt.Skip()
+        if keyCode in (wx.WXK_DELETE, wx.WXK_BACK):
+            self.Home()
+            self.DelLineRight()
+            evt.Skip()
+        if keyCode in (ord('Z'), ord('Y')) and evt.ControlDown():
+            evt.Skip()
+        if keyCode == wx.WXK_TAB:
+            lineIdx = self.GetCurrentLine()
+            self.SetLineIndentation(lineIdx, self.config.tabIndentLen)
+            print "tab pressed"
         self.show_work_mode()
         
     def move_in_edit_mode(self, evt):
         key = evt.GetKeyCode()
-        if key == wx.WXK_UP: pass
+        if key == wx.WXK_UP: self.Home()
         elif key == wx.WXK_DOWN: self.LineEnd()
         else:
             curLine, curPos = self.GetCurLine()
-            if curPos == 0 and key == wx.WXK_LEFT: pass
-            elif curPos == len(curLine)-1 and key == wx.WXK_RIGHT: pass
+            if curPos == 0 and key in (wx.WXK_LEFT, wx.WXK_BACK): pass
+            elif curPos == len(curLine)-1 and key in (wx.WXK_RIGHT, wx.WXK_DELETE): pass
             else: evt.Skip()
         
-    
     def work_in_edit_mode(self, evt):
         keyCode = evt.GetKeyCode()
         if keyCode in (wx.WXK_RETURN, wx.WXK_ESCAPE):
-            if keyCode == wx.WXK_RETURN: self.LineEnd()
+            if keyCode == wx.WXK_RETURN: 
+                self.LineEnd()
+                curLine = self.GetCurLine()[0]
+                if len(curLine.strip()): evt.Skip()
             self.mode = 'View'
-        
-        if keyCode in (wx.WXK_UP, wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT):
+        elif keyCode in (wx.WXK_UP, wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_BACK, wx.WXK_DELETE):
             self.move_in_edit_mode(evt)
         else:
             evt.Skip()
@@ -93,9 +115,9 @@ class myStc(stc.StyledTextCtrl):
         else:
             self.work_in_edit_mode(evt)
             
-    def AddText(self, text):
-        if self.mode == 'View': return
-        else: super(myStc, self).AddText(text)
+#    def AddText(self, text):
+#        if self.mode == 'View': return
+#        else: super(myStc, self).AddText(text)
 
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -109,8 +131,10 @@ class myFrame(wx.Frame):
         self.statusBar = self.CreateStatusBar()
         self.panel = myPanel(self)
         vSizer.Add(self.panel,0,wx.EXPAND)
-        self.control = myStc(self)
-        vSizer.Add(self.control,1, wx.EXPAND)
+        self.stcConfig = myStcConfiguration()
+        self.stc = myStc(self, self.stcConfig)
+        vSizer.Add(self.stc,1, wx.EXPAND)
+        self.stc.SetFocus()
 
         
         filemenu = wx.Menu()
@@ -164,7 +188,7 @@ class myFrame(wx.Frame):
             self.setFileName(dlg.GetPath())
             if self.path : 
                 f = open(self.path, 'r')
-                self.control.SetValue(f.read())
+                self.stc.SetValue(f.read())
                 f.close()
         dlg.Destroy()
         
@@ -176,15 +200,15 @@ class myFrame(wx.Frame):
             else:
                 return             
         f=open(self.path, 'w+')
-        f.write(self.control.GetValue())
+        f.write(self.stc.GetValue())
         f.close()
         
     def onClear(self):
-        self.control.ClearAll()
+        self.stc.ClearAll()
         
     def onCheckBox(self, isChecked):
-        if isChecked: self.control.AddText("The checkBox Checked\n")
-        else: self.control.AddText("The checkBox Unchecked\n")
+        if isChecked: self.stc.AddText("The checkBox Checked\n")
+        else: self.stc.AddText("The checkBox Unchecked\n")
 
 if __name__=='__main__':
     app = wx.App(False)
