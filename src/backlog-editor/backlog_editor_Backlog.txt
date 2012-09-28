@@ -17,6 +17,24 @@ As a user, I want to undo my changes so that I can recover my wrong operation qu
 As a implementer, I want to attach outcome to the item so that I can trace our progress from the backlog-editor
 As an implementer, I want to add sub-items to the item so that it can reflect our understanding to the task more structured.
 
+Implementation study requirements:
+Move caret 
+    Move caret Home and end   ---Done
+    Move caret to paticular position 
+Set indention                 ---Done
+Save/Load Text, which include utf-8 text     ---Done
+Change text font
+   define font             ----done
+   set font to the texts
+Add margin to hide/show lines
+Add result panel
+Drag and drop 
+
+Business reuqirement:
+Establish a company 
+Send the evaluation version to some people
+Study phone version implementation requirement
+
 ----------------------------------------------------------------------------
 To be studied items: 
 1. RichTextCtrl          ---done

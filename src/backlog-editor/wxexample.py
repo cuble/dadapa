@@ -18,7 +18,7 @@
 import os
 import wx
 import wx.stc as stc
-
+import codecs
 
 class myPanel(wx.Panel):
     def __init__(self, parent):
@@ -46,19 +46,33 @@ class myStcConfiguration:
     def __init__(self):
         self.activeItemBackground = wx.LIGHT_GREY
         self.tabIndentLen = 4
+        self.textFonts = []
+        self.textFonts.append(('Times New Roman', 12))
+        self.textFonts.append(('Times New Roman', 10))
 
 class myStc(stc.StyledTextCtrl):
     def __init__(self, parent, config, size=(600,400)):
         stc.StyledTextCtrl.__init__(self, parent, size=size)
         self.config = config
+        
+        self.maxDepth = len(self.config.textFonts)
+        self.StyleSetSpec(stc.STC_STYLE_DEFAULT, "face:%s, size:%d" % ('Times New Roma', 12))
+        self.StyleClearAll()
+        fontIdx = 1
+        for font in self.config.textFonts:
+            self.StyleSetSpec(fontIdx, "bold,face:%s,size:%d,fore:#0000FF" % (font[0], font[1]))
+    
         self.SetCaretLineBackground(self.config.activeItemBackground)
         #self.SetCaretLineBackAlpha(80)
-        self.SetCaretLineVisible(True)        
+        self.SetCaretLineVisible(True)
 
         self.mode = 'View'
         
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down, self)
         self.show_work_mode()
+        
+        font = self.GetFont()
+        print 
 
     def show_work_mode(self):
         parent = self.GetParent()
@@ -81,8 +95,11 @@ class myStc(stc.StyledTextCtrl):
             evt.Skip()
         if keyCode == wx.WXK_TAB:
             lineIdx = self.GetCurrentLine()
-            self.SetLineIndentation(lineIdx, self.config.tabIndentLen)
-            print "tab pressed"
+            curIndent = self.GetLineIndentation(lineIdx)
+            indent = curIndent + self.config.tabIndentLen
+            if evt.ShiftDown():
+                indent = curIndent - self.config.tabIndentLen*2
+            self.SetLineIndentation(lineIdx, indent)
         self.show_work_mode()
         
     def move_in_edit_mode(self, evt):
@@ -115,9 +132,9 @@ class myStc(stc.StyledTextCtrl):
         else:
             self.work_in_edit_mode(evt)
             
-#    def AddText(self, text):
-#        if self.mode == 'View': return
-#        else: super(myStc, self).AddText(text)
+    def AddText(self, text):
+        if self.mode == 'View': return
+        else: super(myStc, self).AddText(text)
 
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -187,8 +204,8 @@ class myFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             self.setFileName(dlg.GetPath())
             if self.path : 
-                f = open(self.path, 'r')
-                self.stc.SetValue(f.read())
+                f = codecs.open(self.path, 'r', 'utf-8-sig')
+                self.stc.SetText(f.read())
                 f.close()
         dlg.Destroy()
         
@@ -199,8 +216,9 @@ class myFrame(wx.Frame):
                 self.setFileName(dlg.GetPath())
             else:
                 return             
-        f=open(self.path, 'w+')
-        f.write(self.stc.GetValue())
+        f=codecs.open(self.path, 'w', "utf-8-sig")
+        text = self.stc.GetText()
+        f.write(text)
         f.close()
         
     def onClear(self):
