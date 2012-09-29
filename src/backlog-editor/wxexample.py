@@ -47,36 +47,71 @@ class myStcConfiguration:
         self.activeItemBackground = wx.LIGHT_GREY
         self.tabIndentLen = 4
         self.textFonts = []
+        self.textFonts.append(('Times New Roman', 18))
+        self.textFonts.append(('Times New Roman', 14))
         self.textFonts.append(('Times New Roman', 12))
         self.textFonts.append(('Times New Roman', 10))
+
 
 class myStc(stc.StyledTextCtrl):
     def __init__(self, parent, config, size=(600,400)):
         stc.StyledTextCtrl.__init__(self, parent, size=size)
+        self.SetUseHorizontalScrollBar(False)
         self.config = config
         
         self.maxDepth = len(self.config.textFonts)
-        self.StyleSetSpec(stc.STC_STYLE_DEFAULT, "face:%s, size:%d" % ('Times New Roma', 12))
+        self.StyleSetSpec(stc.STC_STYLE_DEFAULT, "face:%s,size:%d" % (self.config.textFonts[0][0], self.config.textFonts[0][1]))
         self.StyleClearAll()
         fontIdx = 1
         for font in self.config.textFonts:
-            self.StyleSetSpec(fontIdx, "bold,face:%s,size:%d,fore:#0000FF" % (font[0], font[1]))
+            self.StyleSetSpec(fontIdx, "bold,face:%s,size:%d,fore:#000000" % (font[0], font[1]))
+            fontIdx += 1
     
         self.SetCaretLineBackground(self.config.activeItemBackground)
         #self.SetCaretLineBackAlpha(80)
         self.SetCaretLineVisible(True)
 
         self.mode = 'View'
-        
+
+        self.add_margin()
+
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down, self)
+        self.Bind(stc.EVT_STC_MARGINCLICK, self.OnMarginClick)
         self.show_work_mode()
         
         font = self.GetFont()
         print 
 
+    def add_margin(self):        
+        self.SetMargins(0,0)
+        self.SetMarginType(2, stc.STC_MARGIN_SYMBOL)
+        self.SetMarginMask(2, stc.STC_MASK_FOLDERS)
+        self.SetMarginSensitive(2, True)
+        self.SetMarginWidth(2, 12)
+        
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDEROPEN,    stc.STC_MARK_CIRCLEMINUS,          "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDER,        stc.STC_MARK_CIRCLEPLUS,           "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDERSUB,     stc.STC_MARK_VLINE,                "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDERTAIL,    stc.STC_MARK_LCORNERCURVE,         "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDEREND,     stc.STC_MARK_CIRCLEPLUSCONNECTED,  "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDEROPENMID, stc.STC_MARK_CIRCLEMINUSCONNECTED, "white", "#404040")
+        self.MarkerDefine(stc.STC_MARKNUM_FOLDERMIDTAIL, stc.STC_MARK_TCORNERCURVE,         "white", "#404040")
+
+
     def show_work_mode(self):
         parent = self.GetParent()
         parent.statusBar.SetStatusText("Current work mode is: " + self.mode)
+
+    def format_cur_line(self, fontIdx):
+        curLine = self.GetCurLineRaw()[0]
+        self.Home()
+        startPos = self.GetCurrentPos()
+        self.StartStyling(startPos, 0xff)
+        self.SetStyling(len(curLine), fontIdx)
+        if fontIdx>1: 
+            self.SetUseHorizontalScrollBar(True)
+        else:
+            self.SetUseHorizontalScrollBar(False)
 
     def work_in_view_mode(self, evt):
         keyCode = evt.GetKeyCode()
@@ -97,9 +132,12 @@ class myStc(stc.StyledTextCtrl):
             lineIdx = self.GetCurrentLine()
             curIndent = self.GetLineIndentation(lineIdx)
             indent = curIndent + self.config.tabIndentLen
+            fontIdx = 1
             if evt.ShiftDown():
-                indent = curIndent - self.config.tabIndentLen*2
+                indent = curIndent - self.config.tabIndentLen
+            fontIdx = indent>0 and indent/4+1 or 1
             self.SetLineIndentation(lineIdx, indent)
+            self.format_cur_line(fontIdx)
         self.show_work_mode()
         
     def move_in_edit_mode(self, evt):
@@ -135,6 +173,9 @@ class myStc(stc.StyledTextCtrl):
     def AddText(self, text):
         if self.mode == 'View': return
         else: super(myStc, self).AddText(text)
+        
+    def OnMarginClick(self, evt):
+        pass
 
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -144,15 +185,19 @@ class myFrame(wx.Frame):
         if os.path.isfile('./wxpdemo.ico'):
             self.ico = wx.Icon('wxpdemo.ico', wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.ico)
-        vSizer = wx.BoxSizer(wx.VERTICAL)
         self.statusBar = self.CreateStatusBar()
+        vSizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = myPanel(self)
         vSizer.Add(self.panel,0,wx.EXPAND)
         self.stcConfig = myStcConfiguration()
         self.stc = myStc(self, self.stcConfig)
         vSizer.Add(self.stc,1, wx.EXPAND)
         self.stc.SetFocus()
-
+        self.sizer = vSizer
+        
+        self.resultStc = stc.StyledTextCtrl(self, -1, style=0, size=(200,100))
+        self.resultStc.SetUseHorizontalScrollBar(False)
+        vSizer.Add(self.resultStc, 0, wx.EXPAND)
         
         filemenu = wx.Menu()
 

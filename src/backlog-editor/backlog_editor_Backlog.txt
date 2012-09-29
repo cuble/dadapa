@@ -25,14 +25,17 @@ Set indention                 ---Done
 Save/Load Text, which include utf-8 text     ---Done
 Change text font
    define font             ----done
-   set font to the texts
+   set font to the texts   ----done
+   make the line's style change when input
 Add margin to hide/show lines
-Add result panel
+Add result panel       ---done
 Drag and drop 
 
 Business reuqirement:
-Establish a company 
 Send the evaluation version to some people
+    First version: local version
+    Second Version: network version
+Establish a company 
 Study phone version implementation requirement
 
 ----------------------------------------------------------------------------
