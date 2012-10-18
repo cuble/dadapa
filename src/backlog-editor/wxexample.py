@@ -46,7 +46,7 @@ class myStcConfiguration:
     def __init__(self):
         self.activeItemBackground = wx.LIGHT_GREY
         self.tabIndentLen = 4
-        self.textFonts = []
+        self.textFonts = [ ]
         self.textFonts.append(('Times New Roman', 18))
         self.textFonts.append(('Times New Roman', 14))
         self.textFonts.append(('Times New Roman', 12))
@@ -76,7 +76,8 @@ class myStc(stc.StyledTextCtrl):
         self.add_margin()
 
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down, self)
-        self.Bind(stc.EVT_STC_MARGINCLICK, self.OnMarginClick)
+        self.Bind(stc.EVT_STC_MARGINCLICK, self.OnMarginClick, self)
+        self.Bind(stc.EVT_STC_MODIFIED, self.OnModified, self)
         self.show_work_mode()
         
         font = self.GetFont()
@@ -87,7 +88,7 @@ class myStc(stc.StyledTextCtrl):
         self.SetMarginType(2, stc.STC_MARGIN_SYMBOL)
         self.SetMarginMask(2, stc.STC_MASK_FOLDERS)
         self.SetMarginSensitive(2, True)
-        self.SetMarginWidth(2, 12)
+        self.SetMarginWidth(2, 16)
         
         self.MarkerDefine(stc.STC_MARKNUM_FOLDEROPEN,    stc.STC_MARK_CIRCLEMINUS,          "white", "#404040")
         self.MarkerDefine(stc.STC_MARKNUM_FOLDER,        stc.STC_MARK_CIRCLEPLUS,           "white", "#404040")
@@ -96,7 +97,7 @@ class myStc(stc.StyledTextCtrl):
         self.MarkerDefine(stc.STC_MARKNUM_FOLDEREND,     stc.STC_MARK_CIRCLEPLUSCONNECTED,  "white", "#404040")
         self.MarkerDefine(stc.STC_MARKNUM_FOLDEROPENMID, stc.STC_MARK_CIRCLEMINUSCONNECTED, "white", "#404040")
         self.MarkerDefine(stc.STC_MARKNUM_FOLDERMIDTAIL, stc.STC_MARK_TCORNERCURVE,         "white", "#404040")
-
+        
 
     def show_work_mode(self):
         parent = self.GetParent()
@@ -176,6 +177,12 @@ class myStc(stc.StyledTextCtrl):
         
     def OnMarginClick(self, evt):
         pass
+    
+    def OnModified(self, evt):
+        lineIdx = self.GetCurrentLine()
+        if lineIdx>2: 
+            self.SetFoldLevel(1, 0x5001)
+            self.SetFoldLevel(2, 1)
 
 class myFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -270,8 +277,10 @@ class myFrame(wx.Frame):
         self.stc.ClearAll()
         
     def onCheckBox(self, isChecked):
+        self.stc.BeginUndoAction()
         if isChecked: self.stc.AddText("The checkBox Checked\n")
         else: self.stc.AddText("The checkBox Unchecked\n")
+        self.stc.EndUndoAction()
 
 if __name__=='__main__':
     app = wx.App(False)

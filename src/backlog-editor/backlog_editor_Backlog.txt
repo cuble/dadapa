@@ -20,7 +20,7 @@ As an implementer, I want to add sub-items to the item so that it can reflect ou
 Implementation study requirements:
 Move caret 
     Move caret Home and end   ---Done
-    Move caret to paticular position 
+    Move caret to paticular position   ---Done
 Set indention                 ---Done
 Save/Load Text, which include utf-8 text     ---Done
 Change text font
@@ -28,8 +28,12 @@ Change text font
    set font to the texts   ----done
    make the line's style change when input
 Add margin to hide/show lines
+   study about folder margin
+   study about margin click
 Add result panel       ---done
 Drag and drop 
+Multi-page
+Ctrl+Z/Ctrl+Y operation     ---done
 
 Business reuqirement:
 Send the evaluation version to some people
