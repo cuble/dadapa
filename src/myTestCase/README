@@ -33,7 +33,7 @@ Basic usage:
 	def test_functions_with_print(self):
 		#print result should be checked, or case will fail
 		print 'hello world'
-		self.check_output('hello world\n')
+		self.check_print_result('hello world\n')
 		
 	def test_stub_a_function(self):
 		#stubed function will be recovered automatically

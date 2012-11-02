@@ -89,3 +89,17 @@ styledTextCtrl2: ed.CmdKeyAssign, ed.SetLexer, stc.STC_LEX_PYTHON, keyword.kwlis
 wx Events: wx.EVT_WINDOW_DESTROY, wx.EVT_BUTTON,
 
 others: wx.lib.colourselect, wx.WXK_xxxx, wx.StaticBitmap, wx.EmptyBitmap, wx.EVT_COMBOBOX.GetSelection, wx.FONTWEIGHT_BOLD, wx.StaticBoxSizer, wx.Dialog.ShowModal, wx.EVT_LEFT_DCLICK.GetPosition
+
+-----------------------------------------------------------------------------
+Lexing
+Compiling
+
+Colourise
+FormatRange
+GetCurLine, GetCurLineRaw, GetCurLineUTF8
+GetFoldExpanded, GetFoldLevel, GetFoldParent, GetLastChild
+GetLayoutCache
+
+GetLineIndentation, GetLineIndentPosition
+
+GetLineState
