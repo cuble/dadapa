@@ -46,9 +46,12 @@
 
 5. Work on with github:  
    5.1* git log: check commit hitstory. Try: git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short.
+       *git log -p -2: display the detailed change history of last two commit
+       *git log --stat: display the change overview of each commit
    5.2* git pull: fetch from and merge with another repository. git pull is shorthand for "git fetch" followed by "git merge FETCH_HEAD".
    5.3* git add: to add a file or a change to be staged in a git repo. "git add ." to stage all the changed files, which include added and modified, in the project directory. 
    5.4* git diff: show differences between your current working files and the files staged to git. 
+        *git diff --cached: show difference between staged files and committed files. "git diff --staged" has the same function.
         *git diff <hash1> <hash2>: show differences between the two commit. We only need short hash value which long 6 char.
    5.5* git commit -m "msg": commit the staged changes to the local git version control. git commit -a, is a combined of "git add changed_files" and commit.
         git commit --amend -m "more msg amend to the previous commit"
@@ -64,7 +67,7 @@
         git reset --soft HEAD^: used to revert local commit, your change will keep. 
 	git reset --hard HEAD^: your change will lose.
    5.12 git config: configure git environent. For example: git config --global alias.co "checkout": set alias co=checkout in git. We can set a shortcut for the log command in 5.1
-   5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the current head of current branch).
+   5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the curre	nt head of current branch).
    5.14 git merge branch1: merge branch1 to current branch. 
    5.15 git rebase branch1: merge branch1 to current branch, and commit history will also merged together to current branch.
    5.16* git push origin master: push local committed changes to the master brach of remote/origin repo.
@@ -111,4 +114,4 @@ http://help.github.com/
 http://gitimmersion.com/lab_01.html
 http://gitimmersion.com/lab_52.html
 http://help.github.com/git-cheat-sheets/
-
+http://git-scm.com/book/en

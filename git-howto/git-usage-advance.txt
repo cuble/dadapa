@@ -7,3 +7,43 @@
 3. To check the change in GUI
   - gitk [file]
 
+4. There are three level git config values: /etc/gitconfig, ~/.gitconfig, ./.git/config
+
+5. git log --pretty=format:"options", options as following:
+    %H  Commit hash
+    %h  Abbreviated commit hash
+    %T  Tree hash
+    %t  Abbreviated tree hash
+    %P  Parent hashes
+    %p  Abbreviated parent hashes
+    %an Author name
+    %ae Author e-mail
+    %ad Author date (format respects the –date= option)
+    %ar Author date, relative
+    %cn Committer name
+    %ce Committer email
+    %cd Committer date
+    %cr Committer date, relative
+    %s  Subject
+  filter options for git log:
+    --since, --after, --util, --before,  --author, --committer, --grep(used to grep commit message), -(n) (show only last n commits)
+	--all-match, this option is needed in some condition to make filter by all given conditions
+	file name or path can be given to filter logs that contain the selected files change information. '--' is used to split files or path from options
+	example: git log --since=2012-10-1 --before=2013-10-1 -- README
+	
+6. git remote:
+  - git remote -v
+  - git remote add [name] [url]
+  - git remote show [name], show branch information of remote and related configuration locally
+  - git remote rename [orgName] [newName], git remote rm [name]
+  
+7. git tag
+  - git tag -l 'v1.4.2.*', used to list all the tags start with v1.4.2.
+  - git tag -a [tagName] -m [message], to add a annotated tag. git tag -a [tagName] -m [message] [commitChecksum] can be used to tag a old commit.
+  - git tag -s [tagName] -m [message], to add a signed tag, which can be verified by 'git tag -v [tagName]'
+  - git tag [tagName], create a lightweight tag which create a file referred to the commit checksum.
+  - git push origin [tagName], to push the tag to origin server. git push origin --tags to push all tags to origin server.
+  
+8. tips:
+  - make auto completion work for git: source git-completion.bash. 'git-completion.bash' located in git source code's contrib/completion. add the command into .bashrc to make it auto configured. Or copy it to /etc/bash_completion.d/ to make it auto configured for all uses.
+  - git config --global alias.visual '!gitk', to make 'git visual' load external command 'gitk'.
