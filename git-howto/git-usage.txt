@@ -67,7 +67,7 @@
         git reset --soft HEAD^: used to revert local commit, your change will keep. 
 	git reset --hard HEAD^: your change will lose.
    5.12 git config: configure git environent. For example: git config --global alias.co "checkout": set alias co=checkout in git. We can set a shortcut for the log command in 5.1
-   5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the curre	nt head of current branch).
+   5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the current head of current branch).
    5.14 git merge branch1: merge branch1 to current branch. 
    5.15 git rebase branch1: merge branch1 to current branch, and commit history will also merged together to current branch.
    5.16* git push origin master: push local committed changes to the master brach of remote/origin repo.
