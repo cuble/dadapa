@@ -47,3 +47,19 @@
 8. tips:
   - make auto completion work for git: source git-completion.bash. 'git-completion.bash' located in git source code's contrib/completion. add the command into .bashrc to make it auto configured. Or copy it to /etc/bash_completion.d/ to make it auto configured for all uses.
   - git config --global alias.visual '!gitk', to make 'git visual' load external command 'gitk'.
+
+9. work with branch
+  - git checkout -b issuexx, create a new branch named issuexx from HEAD and checkout it
+    - git checkout -b issuexx origin/issuexx, to create local issuexx branch base on remote issuexx and check it out
+	  - git checkout --track origin/issuexx, the same as up command
+  - git branch issueyy, create a branch named issueyy from HEAD
+    - git branch, show all branchs 
+	- git branch -v, show HEAD information of all branchs
+	- git branch --merged(--no-merged), to filter branches concerning whether the content of the branch merged to current branch(master)
+  - git merge issueyy, merge branch issueyy into current HEAD
+  - git mergetool, to laugch visule merge tool when conflict found after merge
+  - git branch -d [branchName], to delete a branch
+    - git branch -D [branchName], to force delete a branch, which not one of the ancestor of the HEAD(not merged yet)
+  - git push [remoteName] [branchName], to push local branch to remote
+    - git push [remoteName] [localBranch]:[remoteBranch], to push local branch to remote and reset name
+    - git push [remoteName] :[branchName], to remove a remote branch
