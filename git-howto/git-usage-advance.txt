@@ -63,3 +63,8 @@
   - git push [remoteName] [branchName], to push local branch to remote
     - git push [remoteName] [localBranch]:[remoteBranch], to push local branch to remote and reset name
     - git push [remoteName] :[branchName], to remove a remote branch
+  - git rebase [baseBranch]: merge current branch to base branch in rebase manner
+    - git rebase [baseBranch] [topicBranch]: merge topic branch to base branch in rebase manner
+    - git rebase --onto [targetBranch] [baseBranch] [topicBranch]: merge topic branch's content, which not in the base branch, to target branch in rebase manner
+    
+  
