@@ -66,5 +66,23 @@
   - git rebase [baseBranch]: merge current branch to base branch in rebase manner
     - git rebase [baseBranch] [topicBranch]: merge topic branch to base branch in rebase manner
     - git rebase --onto [targetBranch] [baseBranch] [topicBranch]: merge topic branch's content, which not in the base branch, to target branch in rebase manner
+
+10. Create git server
+  - SSH protocal: all you need is a SSH server and a bare repository, which users can access
+    - Authenticate with file access need to setup accounts on SSH server one by one
+	- Authenticate with SSH access
+	  - create user 'git' on SSH server, and create file ~/.ssh/authorized_keys
+	  - collecting pub keys of users, and add them into the authorized_keys, cat id_rsa.userxx.pub >> ~/.ssh/authorized_keys
+	  - userxx do: git remote add origin git@gitserver:/path/to/project.git, check if git works
+	  - disable shell of user 'git': change user's shell in /etc/passwd from '/bin/bash' to '/usr/bin/git-shell', test it by: 'ssh git@gitserver'
+  - HTTP protocal: 
+    - Apache Server
+	- gitweb
+	  
+11. 
+  
+References：
+  http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt
+
     
   
