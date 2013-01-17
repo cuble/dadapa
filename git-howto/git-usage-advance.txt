@@ -81,8 +81,32 @@
   - Git Server Management: gitosis, gitolite
   - Git Protocal:
   
-	  
-11. 
+
+11. Work modes
+  - Peer group
+    - git clone [remote] [localdir], work on master
+        - git commit -am [msg]
+        - git push origin master, do following thing if be rejected
+        - git fetch origin
+        - git merge origin/master, then push
+
+    - git branch issuexx, work on issuexx
+        - git fetch origin,
+        - git log --no-merges origin/master ^issuexx, check others' change
+        - git checkout master, git merge issuexx, git merge origin/master, then push
+
+  - Peer groups with dedicate integrate manager
+    - git checkout -b FeatureA, work on FeatureA
+        - you can switch to FeatureA if you have worked on other branch, git checkout FeatureA
+        - git fetch origin
+        - git merge origin/FeatureA, OR "git merge origin/FeatrueApp" in case remote branch is FeatrueApp
+        - git push origin FeatureA, OR "git push origin FeatureA:FeatureApp" in case remote branch is FeatureApp
+        - After FeatureA ready, the integrater manager will do following things:
+            - git fetch origin
+            - git merge origin/FeatureA, maybe also "git merge origin/FeatureB" in case other features ready too
+            - git push origin master
+  - Commit code and history though integrate manager only
+  - Commit code though integrate manager only
   
 References：
   http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt
