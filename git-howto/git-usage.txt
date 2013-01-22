@@ -65,7 +65,10 @@
    5.10* git tag: tag one version of the working copy. "git tag V1", "git checkout V1".
    5.11 git revert: to revert a published commit. For example: git revert HEAD --no-edit.
         git reset --soft HEAD^: used to revert local commit, your change will keep. 
-	git reset --hard HEAD^: your change will lose.
+        git reset --hard HEAD^: your change will lose.
+        "^" means the first ancestor of the ref, "^2" means the second ancestor. 
+        "~" means the first ancestor of the ref, "~2" means the first parent of the first parent, which is the grandparent.
+        Note: HEAD~==HEAD^, HEAD~2!=HEAD^2
    5.12 git config: configure git environent. For example: git config --global alias.co "checkout": set alias co=checkout in git. We can set a shortcut for the log command in 5.1
    5.13 git branch branch1: to create branch1 on the HEAD of master branch(Actually, it's the current head of current branch).
    5.14 git merge branch1: merge branch1 to current branch. 
