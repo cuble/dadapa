@@ -154,6 +154,45 @@
         - git log refA..refB == git log ^refA refB == git log refB --not refA
     - git log master...topicxxx, it will show what have changed in master and topicxxx since their common ancestor.
         - git log --left-right master...topicxxx, it will distinct master and topicxxx comits.
+  - temporary store changes with stash
+    - git stash, save changes to temporary stash
+        - git stash list, to see what have stored
+    - git stash apply, to apply the file changes in the latest stash, note apply won't delete stash automatically
+        - git stash apply --index, apply both file changes and indexing status in the stash.
+    - git stash drop stash@{n}, to delete the nth stash 
+        - git stash pop, apply the latest stash and delete it
+    - git stash show -p | git apply -R, can be used to unapply the stash apply
+        - git config --global alias.stash-unapply '!git stash show -p | git apply -R'
+    - git stash branch brxxx, create brxxx from stash stored commit and apply the stash, it's recommanded for handle complex stash contents.
+  - modify history commits contents
+    - git filter-branch --tree-filter 'rm -f passwords.txt' HEAD
+    - git filter-branch --subdirectory-filter trunk HEAD
+    - modify e-mail address in commits:
+        git filter-branch --commit-filter '
+            if [ "$GIT_AUTHOR_EMAIL" = "schacon@localhost" ];
+            then
+                    GIT_AUTHOR_NAME="Scott Chacon";
+                    GIT_AUTHOR_EMAIL="schacon@example.com";
+                    git commit-tree "$@";
+            else
+                    git commit-tree "$@";
+            fi' HEAD
+  - Check commit history by code lines
+    - git blame -L 12,22 readme.txt, to show commits which has touched line 12 to 22 of readme.txt
+    - git blame -C -L 14,24 xxxip.c, to show the history of line 14 to 24 of xxxip.c, which include which file the code block was copied to.
+  - Locate the bad version by bisect
+    - git bisect start, to start the locate process
+    - git bisect bad, to set current ref as BAD one
+    - git bisect good v1.0, to set the v1.0 as a good ref, then git will checkout the the middle commit of current commit and v1.0.
+        - after test on the middle commit, you can  set "git bisect good" or "git bisect bad" to continue the search until locate the commit which introduce the problem.
+    - git bisect reset, NOTE, use it to terminate the bisect process, or you will end in weird state.
+    - do bisect process automatically:
+        - git bisect start HEAD v1.0
+        - git bisect run test-error.sh
+        
+  - 
+    
+13. 
 
 References：
   http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt
