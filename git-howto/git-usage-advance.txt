@@ -8,6 +8,9 @@
   - gitk [file]
 
 4. There are three level git config values: /etc/gitconfig, ~/.gitconfig, ./.git/config
+  - git config --system
+  - git config --global
+  - git config
 
 5. git log --pretty=format:"options", options as following:
     %H  Commit hash
@@ -189,10 +192,26 @@
     - do bisect process automatically:
         - git bisect start HEAD v1.0
         - git bisect run test-error.sh
-        
-  - 
     
-13. 
+13. customize git
+  - config
+    - git config commit.template $HOME/.gitmessage.txt, to set the commit message template.
+    - git config core.pager less, to set pager tool for git output when page output needed(such as long "git log"), default is less
+    - git config user.signingkey <gpg-key-id>, set the key to be used when do signature
+    - git config core.excludesfile '.gitignore'
+    - git config help.autocorrect 1
+    - git config color.ui=true
+    - git config core.autocrlf true, it will transfer LF ending to CRLF automatically on windows when fetch file
+        - git config core.autocrlf input, it will transfer CRLF to LF
+        - git config core.autocrlf false, to disable the auto transfer
+    - configure on server side:
+        - git config --system receive.denyNonFastForwards true, to deny non-fastforward push even -f option given
+        - git config --system receive.denyDeletes true, to deny delete operation, to keep public commits clean plus the previous configuration
+        - git config --system receive.fsckObjects true, make server verify SHA-1 checksum when accepting pushes
+  - git export and some other configurations can be configured in .gitattributes
+
+14. Objects in git
+  - hash-object
 
 References：
   http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt
